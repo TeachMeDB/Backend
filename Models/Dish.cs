@@ -8,6 +8,7 @@ namespace youAreWhatYouEat.Models
         public Dish()
         {
             CommentOnDishes = new HashSet<CommentOnDish>();
+            Dishorderlists = new HashSet<Dishorderlist>();
             Hasdishes = new HashSet<Hasdish>();
             Chefs = new HashSet<Employee>();
             Dtags = new HashSet<Dishtag>();
@@ -20,6 +21,7 @@ namespace youAreWhatYouEat.Models
         public string DishDescription { get; set; } = null!;
 
         public virtual ICollection<CommentOnDish> CommentOnDishes { get; set; }
+        public virtual ICollection<Dishorderlist> Dishorderlists { get; set; }
         public virtual ICollection<Hasdish> Hasdishes { get; set; }
 
         public virtual ICollection<Employee> Chefs { get; set; }

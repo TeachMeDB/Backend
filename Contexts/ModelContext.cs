@@ -61,7 +61,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<Asset>(entity =>
             {
                 entity.HasKey(e => e.AssetsId)
-                    .HasName("SYS_C0010693");
+                    .HasName("SYS_C0011098");
 
                 entity.ToTable("ASSETS");
 
@@ -86,13 +86,13 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Assets)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("SYS_C0010694");
+                    .HasConstraintName("SYS_C0011099");
             });
 
             modelBuilder.Entity<Attend>(entity =>
             {
                 entity.HasKey(e => new { e.PlanId, e.EmployeeId })
-                    .HasName("SYS_C0010681");
+                    .HasName("SYS_C0011086");
 
                 entity.ToTable("ATTEND");
 
@@ -111,18 +111,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Attends)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("SYS_C0010682");
+                    .HasConstraintName("SYS_C0011087");
 
                 entity.HasOne(d => d.Plan)
                     .WithMany(p => p.Attends)
                     .HasForeignKey(d => d.PlanId)
-                    .HasConstraintName("SYS_C0010683");
+                    .HasConstraintName("SYS_C0011088");
             });
 
             modelBuilder.Entity<Award>(entity =>
             {
                 entity.HasKey(e => e.Lv)
-                    .HasName("SYS_C0010673");
+                    .HasName("SYS_C0011078");
 
                 entity.ToTable("AWARD");
 
@@ -139,7 +139,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<CommentOnDish>(entity =>
             {
                 entity.HasKey(e => e.CommentId)
-                    .HasName("SYS_C0010790");
+                    .HasName("SYS_C0011198");
 
                 entity.ToTable("COMMENT_ON_DISH");
 
@@ -173,18 +173,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Dish)
                     .WithMany(p => p.CommentOnDishes)
                     .HasForeignKey(d => d.DishId)
-                    .HasConstraintName("SYS_C0010792");
+                    .HasConstraintName("SYS_C0011200");
 
                 entity.HasOne(d => d.UserNameNavigation)
                     .WithMany(p => p.CommentOnDishes)
                     .HasForeignKey(d => d.UserName)
-                    .HasConstraintName("SYS_C0010791");
+                    .HasConstraintName("SYS_C0011199");
             });
 
             modelBuilder.Entity<CommentOnService>(entity =>
             {
                 entity.HasKey(e => e.CommentId)
-                    .HasName("SYS_C0010796");
+                    .HasName("SYS_C0011204");
 
                 entity.ToTable("COMMENT_ON_SERVICE");
 
@@ -214,13 +214,13 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.UserNameNavigation)
                     .WithMany(p => p.CommentOnServices)
                     .HasForeignKey(d => d.UserName)
-                    .HasConstraintName("SYS_C0010797");
+                    .HasConstraintName("SYS_C0011205");
             });
 
             modelBuilder.Entity<Dinningtable>(entity =>
             {
                 entity.HasKey(e => e.TableId)
-                    .HasName("SYS_C0010770");
+                    .HasName("SYS_C0011148");
 
                 entity.ToTable("DINNINGTABLE");
 
@@ -268,11 +268,11 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Dishes)
                     .UsingEntity<Dictionary<string, object>>(
                         "ChefCancookDish",
-                        l => l.HasOne<Employee>().WithMany().HasForeignKey("ChefId").HasConstraintName("SYS_C0010721"),
-                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0010720"),
+                        l => l.HasOne<Employee>().WithMany().HasForeignKey("ChefId").HasConstraintName("SYS_C0011126"),
+                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0011125"),
                         j =>
                         {
-                            j.HasKey("DishId", "ChefId").HasName("SYS_C0010719");
+                            j.HasKey("DishId", "ChefId").HasName("SYS_C0011124");
 
                             j.ToTable("CHEF_CANCOOK_DISH");
 
@@ -285,11 +285,11 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Dishes)
                     .UsingEntity<Dictionary<string, object>>(
                         "DishHasTag",
-                        l => l.HasOne<Dishtag>().WithMany().HasForeignKey("DtagId").HasConstraintName("SYS_C0010718"),
-                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0010717"),
+                        l => l.HasOne<Dishtag>().WithMany().HasForeignKey("DtagId").HasConstraintName("SYS_C0011123"),
+                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0011122"),
                         j =>
                         {
-                            j.HasKey("DishId", "DtagId").HasName("SYS_C0010716");
+                            j.HasKey("DishId", "DtagId").HasName("SYS_C0011121");
 
                             j.ToTable("DISH_HAS_TAG");
 
@@ -302,11 +302,11 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Dishes)
                     .UsingEntity<Dictionary<string, object>>(
                         "DisheNeedIngr",
-                        l => l.HasOne<Ingredient>().WithMany().HasForeignKey("IngrId").HasConstraintName("SYS_C0010724"),
-                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0010723"),
+                        l => l.HasOne<Ingredient>().WithMany().HasForeignKey("IngrId").HasConstraintName("SYS_C0011129"),
+                        r => r.HasOne<Dish>().WithMany().HasForeignKey("DishId").HasConstraintName("SYS_C0011128"),
                         j =>
                         {
-                            j.HasKey("DishId", "IngrId").HasName("SYS_C0010722");
+                            j.HasKey("DishId", "IngrId").HasName("SYS_C0011127");
 
                             j.ToTable("DISHE_NEED_INGR");
 
@@ -319,7 +319,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<Dishorderlist>(entity =>
             {
                 entity.HasKey(e => e.DishOrderId)
-                    .HasName("SYS_C0010753");
+                    .HasName("SYS_C0011162");
 
                 entity.ToTable("DISHORDERLIST");
 
@@ -329,8 +329,7 @@ namespace youAreWhatYouEat.Models
                     .HasColumnName("DISH_ORDER_ID");
 
                 entity.Property(e => e.DishId)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .HasColumnType("NUMBER(38)")
                     .HasColumnName("DISH_ID");
 
                 entity.Property(e => e.DishStatus)
@@ -346,12 +345,22 @@ namespace youAreWhatYouEat.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("ORDER_ID");
+
+                entity.HasOne(d => d.Dish)
+                    .WithMany(p => p.Dishorderlists)
+                    .HasForeignKey(d => d.DishId)
+                    .HasConstraintName("SYS_C0011164");
+
+                entity.HasOne(d => d.Order)
+                    .WithMany(p => p.Dishorderlists)
+                    .HasForeignKey(d => d.OrderId)
+                    .HasConstraintName("SYS_C0011163");
             });
 
             modelBuilder.Entity<Dishtag>(entity =>
             {
                 entity.HasKey(e => e.DtagId)
-                    .HasName("SYS_C0010708");
+                    .HasName("SYS_C0011113");
 
                 entity.ToTable("DISHTAGS");
 
@@ -392,13 +401,13 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.Occupation)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010678");
+                    .HasConstraintName("SYS_C0011083");
             });
 
             modelBuilder.Entity<Hasdish>(entity =>
             {
                 entity.HasKey(e => new { e.PromotionId, e.DishId })
-                    .HasName("SYS_C0010776");
+                    .HasName("SYS_C0011184");
 
                 entity.ToTable("HASDISH");
 
@@ -417,18 +426,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Dish)
                     .WithMany(p => p.Hasdishes)
                     .HasForeignKey(d => d.DishId)
-                    .HasConstraintName("SYS_C0010778");
+                    .HasConstraintName("SYS_C0011186");
 
                 entity.HasOne(d => d.Promotion)
                     .WithMany(p => p.Hasdishes)
                     .HasForeignKey(d => d.PromotionId)
-                    .HasConstraintName("SYS_C0010777");
+                    .HasConstraintName("SYS_C0011185");
             });
 
             modelBuilder.Entity<Ingredient>(entity =>
             {
                 entity.HasKey(e => e.IngrId)
-                    .HasName("SYS_C0010711");
+                    .HasName("SYS_C0011116");
 
                 entity.ToTable("INGREDIENTS");
 
@@ -455,7 +464,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<IngredientRecord>(entity =>
             {
                 entity.HasKey(e => e.RecordId)
-                    .HasName("SYS_C0010730");
+                    .HasName("SYS_C0011135");
 
                 entity.ToTable("INGREDIENT_RECORD");
 
@@ -504,19 +513,19 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.IngredientRecords)
                     .HasForeignKey(d => d.DirectorId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010731");
+                    .HasConstraintName("SYS_C0011136");
 
                 entity.HasOne(d => d.Ingr)
                     .WithMany(p => p.IngredientRecords)
                     .HasForeignKey(d => d.IngrId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010732");
+                    .HasConstraintName("SYS_C0011137");
             });
 
             modelBuilder.Entity<Manage>(entity =>
             {
                 entity.HasKey(e => new { e.AssetsId, e.ManageType, e.ManageDate, e.ManageReason, e.ManageCost })
-                    .HasName("SYS_C0010700");
+                    .HasName("SYS_C0011105");
 
                 entity.ToTable("MANAGE");
 
@@ -551,18 +560,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Assets)
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.AssetsId)
-                    .HasConstraintName("SYS_C0010702");
+                    .HasConstraintName("SYS_C0011107");
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("SYS_C0010701");
+                    .HasConstraintName("SYS_C0011106");
             });
 
             modelBuilder.Entity<OrderNumber>(entity =>
             {
                 entity.HasKey(e => new { e.OrderDate, e.OrderNumber1 })
-                    .HasName("SYS_C0010765");
+                    .HasName("SYS_C0011176");
 
                 entity.ToTable("ORDER_NUMBER");
 
@@ -589,19 +598,19 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.OrderNumbers)
                     .HasForeignKey(d => d.OrderId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010767");
+                    .HasConstraintName("SYS_C0011178");
 
                 entity.HasOne(d => d.UserNameNavigation)
                     .WithMany(p => p.OrderNumbers)
                     .HasForeignKey(d => d.UserName)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010766");
+                    .HasConstraintName("SYS_C0011177");
             });
 
             modelBuilder.Entity<Orderlist>(entity =>
             {
                 entity.HasKey(e => e.OrderId)
-                    .HasName("SYS_C0010746");
+                    .HasName("SYS_C0011154");
 
                 entity.ToTable("ORDERLIST");
 
@@ -620,9 +629,13 @@ namespace youAreWhatYouEat.Models
                     .HasColumnName("ORDER_STATUS");
 
                 entity.Property(e => e.TableId)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
+                    .HasColumnType("NUMBER(38)")
                     .HasColumnName("TABLE_ID");
+
+                entity.HasOne(d => d.Table)
+                    .WithMany(p => p.Orderlists)
+                    .HasForeignKey(d => d.TableId)
+                    .HasConstraintName("SYS_C0011155");
             });
 
             modelBuilder.Entity<OriginChef>(entity =>
@@ -644,12 +657,12 @@ namespace youAreWhatYouEat.Models
                     .WithMany()
                     .HasForeignKey(d => d.ChefId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010781");
+                    .HasConstraintName("SYS_C0011189");
 
                 entity.HasOne(d => d.DishOrder)
                     .WithMany()
                     .HasForeignKey(d => d.DishOrderId)
-                    .HasConstraintName("SYS_C0010780");
+                    .HasConstraintName("SYS_C0011188");
             });
 
             modelBuilder.Entity<OriginIngrRecord>(entity =>
@@ -670,18 +683,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.DishOrder)
                     .WithMany()
                     .HasForeignKey(d => d.DishOrderId)
-                    .HasConstraintName("SYS_C0010784");
+                    .HasConstraintName("SYS_C0011192");
 
                 entity.HasOne(d => d.Record)
                     .WithMany()
                     .HasForeignKey(d => d.RecordId)
-                    .HasConstraintName("SYS_C0010785");
+                    .HasConstraintName("SYS_C0011193");
             });
 
             modelBuilder.Entity<Payroll>(entity =>
             {
                 entity.HasKey(e => new { e.PayDatetime, e.EmployeeId })
-                    .HasName("SYS_C0010684");
+                    .HasName("SYS_C0011089");
 
                 entity.ToTable("PAYROLL");
 
@@ -696,13 +709,13 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Payrolls)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("SYS_C0010685");
+                    .HasConstraintName("SYS_C0011090");
             });
 
             modelBuilder.Entity<Prize>(entity =>
             {
                 entity.HasKey(e => new { e.PrizeDatetime, e.EmployeeId, e.Lv })
-                    .HasName("SYS_C0010686");
+                    .HasName("SYS_C0011091");
 
                 entity.ToTable("PRIZE");
 
@@ -722,12 +735,12 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Prizes)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("SYS_C0010687");
+                    .HasConstraintName("SYS_C0011092");
 
                 entity.HasOne(d => d.LvNavigation)
                     .WithMany(p => p.Prizes)
                     .HasForeignKey(d => d.Lv)
-                    .HasConstraintName("SYS_C0010688");
+                    .HasConstraintName("SYS_C0011093");
             });
 
             modelBuilder.Entity<Promotion>(entity =>
@@ -755,7 +768,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<Provide>(entity =>
             {
                 entity.HasKey(e => e.RecordId)
-                    .HasName("SYS_C0010738");
+                    .HasName("SYS_C0011143");
 
                 entity.ToTable("PROVIDE");
 
@@ -770,18 +783,18 @@ namespace youAreWhatYouEat.Models
                 entity.HasOne(d => d.Record)
                     .WithOne(p => p.Provide)
                     .HasForeignKey<Provide>(d => d.RecordId)
-                    .HasConstraintName("SYS_C0010739");
+                    .HasConstraintName("SYS_C0011144");
 
                 entity.HasOne(d => d.SIdNavigation)
                     .WithMany(p => p.Provides)
                     .HasForeignKey(d => d.SId)
-                    .HasConstraintName("SYS_C0010740");
+                    .HasConstraintName("SYS_C0011145");
             });
 
             modelBuilder.Entity<Salary>(entity =>
             {
                 entity.HasKey(e => e.Occupation)
-                    .HasName("SYS_C0010675");
+                    .HasName("SYS_C0011080");
 
                 entity.ToTable("SALARY");
 
@@ -798,7 +811,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<Sensor>(entity =>
             {
                 entity.HasKey(e => e.SensId)
-                    .HasName("SYS_C0010715");
+                    .HasName("SYS_C0011120");
 
                 entity.ToTable("SENSORS");
 
@@ -825,7 +838,7 @@ namespace youAreWhatYouEat.Models
             modelBuilder.Entity<Sensorlog>(entity =>
             {
                 entity.HasKey(e => e.SlogId)
-                    .HasName("SYS_C0010727");
+                    .HasName("SYS_C0011132");
 
                 entity.ToTable("SENSORLOG");
 
@@ -849,13 +862,13 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Sensorlogs)
                     .HasForeignKey(d => d.SensId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010728");
+                    .HasConstraintName("SYS_C0011133");
             });
 
             modelBuilder.Entity<Supplier>(entity =>
             {
                 entity.HasKey(e => e.SId)
-                    .HasName("SYS_C0010734");
+                    .HasName("SYS_C0011139");
 
                 entity.ToTable("SUPPLIER");
 
@@ -886,13 +899,13 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Suppliers)
                     .HasForeignKey(d => d.DirectorId)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010735");
+                    .HasConstraintName("SYS_C0011140");
             });
 
             modelBuilder.Entity<Vip>(entity =>
             {
                 entity.HasKey(e => e.UserName)
-                    .HasName("SYS_C0010762");
+                    .HasName("SYS_C0011173");
 
                 entity.ToTable("VIP");
 
@@ -966,7 +979,7 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.WorkPlans)
                     .HasForeignKey(d => d.Occupation)
                     .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("SYS_C0010680");
+                    .HasConstraintName("SYS_C0011085");
             });
 
             OnModelCreatingPartial(modelBuilder);
