@@ -50,7 +50,7 @@ namespace youAreWhatYouEat.Controllers
         [HttpGet("GetAllEmployeeInfo")]
         public List<EmployeeInfo> GetAllEmployeeInfo()
         {
-            IEnumerable < Employee >employeeInfo =  _context.Employees
+            IEnumerable<Employee> employeeInfo = _context.Employees
                 .Include(e => e.Attends)
                 .Include(e => e.Prizes)
                 .ToList();
@@ -70,7 +70,7 @@ namespace youAreWhatYouEat.Controllers
                     tot++;
                     if (item.Attendance == true) participant++;
                 }
-                if(tot != 0) tem.Attendance_rate = participant / tot * 100;
+                if (tot != 0) tem.Attendance_rate = participant / tot * 100;
                 else tem.Attendance_rate = 0;
                 tem.Award_times = employee.Prizes.Count;
 
@@ -85,7 +85,7 @@ namespace youAreWhatYouEat.Controllers
         {
             EmployeeMessage message = new EmployeeMessage();
 
-            Employee employee =  _context.Employees
+            Employee employee = _context.Employees
                 .Include(e => e.Attends)
                     .ThenInclude(a => a.Plan)
                 .Include(e => e.Payrolls)
@@ -105,7 +105,7 @@ namespace youAreWhatYouEat.Controllers
             message.data.Add("payrolls", new List<PayrollInfo>());
             message.data.Add("prizes", new List<PrizeInfo>());
 
-            List <AttendInfo> attends = new List<AttendInfo>();
+            List<AttendInfo> attends = new List<AttendInfo>();
             foreach (Attend attend in employee.Attends)
             {
                 AttendInfo attendObj = new AttendInfo();
