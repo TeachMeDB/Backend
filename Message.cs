@@ -33,39 +33,4 @@ namespace youAreWhatYouEat
             data.Add("occupation", null);
         }
     }
-
-    public class OrderMessage : Message
-    {
-        public OrderMessage()
-        {
-            data.Add("order_id", null);
-            data.Add("creation_time", null);
-            data.Add("table_id", null);
-            data.Add("order_status", null);
-            data.Add("final_payment", null);
-            data.Add("discount_price", null);
-        }
-    }
-
-    public class OrderListSummaryMessage : Message
-    {
-        public OrderListSummaryMessage()
-        {
-            data.Add("order_count", null);
-            data.Add("total_credit", null);
-        }
-    }
-
-    public class OrderListMessage
-    {
-        public Dictionary<string, dynamic> summary { get; set; } = new Dictionary<string, dynamic>();
-        public List<dynamic> orders { get; set; } = new List<dynamic>();
-
-        public int errorCode = 0;
-        public OrderListMessage()
-        {
-            summary["order_count"] = 0;
-            summary["total_credit"] = 0;
-        }
-    }
 }

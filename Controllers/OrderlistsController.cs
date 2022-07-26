@@ -59,6 +59,19 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
+        public class OrderListMessage
+        {
+            public Dictionary<string, dynamic> summary { get; set; } = new Dictionary<string, dynamic>();
+            public List<dynamic> orders { get; set; } = new List<dynamic>();
+
+            public int errorCode = 0;
+            public OrderListMessage()
+            {
+                summary["order_count"] = 0;
+                summary["total_credit"] = 0;
+            }
+        }
+
         // GET: api/Orderlists/GetOrdersByTime
         [HttpGet("GetOrdersByTime")]
         public OrderListMessage GetOrderlist(int begin = 0, int end = 2147483647)
