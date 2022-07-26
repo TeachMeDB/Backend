@@ -60,6 +60,7 @@ namespace youAreWhatYouEat.Controllers
                 await foreach (var s in _context.Sensors.Include(e => e.Sensorlogs).AsAsyncEnumerable())
                 {
                     SensorLogMessage slm = new SensorLogMessage();
+
                     slm.sensor_id = s.SensId;
                     slm.sensor_model = s.SensModel;
                     slm.sensor_type = s.SensType;
