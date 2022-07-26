@@ -46,6 +46,26 @@ namespace youAreWhatYouEat.Controllers
             public List<SensorLogMessage> data { get; set; } = new List<SensorLogMessage>();
         }
 
+        public class SensorUsedRecord
+        {
+            public string? type { get; set; }
+            public decimal consumption { get; set; }
+
+            public SensorUsedRecord(string t, decimal c)
+            {
+                type = t;
+                consumption = c;
+            }
+        }
+
+        public class SensorsGetUsedResourcesMessage
+        {
+            public int code { get; set; } = 200;
+            public DateTime begin { get; set; } = new DateTime();
+            public DateTime end { get; set; } = new DateTime();
+            public List<SensorUsedRecord> data { get; set; } = new List<SensorUsedRecord>();
+        }
+
         // GET: api/Sensors/rawdata
         [HttpGet("rawdata")]
         public async Task<ActionResult<SensorsGetRawDataMessage>> GetRawData(int begin = 0, int end = 2147483647)
@@ -73,6 +93,52 @@ namespace youAreWhatYouEat.Controllers
                     }
                     ret.data.Add(slm);
                 }
+            }
+            catch (Exception)
+            {
+                return StatusCode(201, ret);
+            }
+            return Ok(ret);
+        }
+
+        // GET: api/Sensors/rawdata
+        [HttpGet("used")]
+        public async Task<ActionResult<SensorsGetRawDataMessage>> GetUsedResource(int begin = 0, int end = 2147483647)
+        {
+            if (_context.Sensors == null)
+            {
+                return NotFound();
+            }
+            SensorsGetUsedResourcesMessage ret = new SensorsGetUsedResourcesMessage();
+            ret.begin = UnixTimeUtil.UnixTimeToDateTime(begin);
+            ret.end = UnixTimeUtil.UnixTimeToDateTime(end);
+            try
+            {
+                foreach (var s in _context.Sensors.Include(e => e.Sensorlogs).GroupBy(e => e.SensType))
+                {
+                    var k = s.Key;
+                    decimal v = 0.0M;
+                    foreach (var slg in s.AsEnumerable())
+                    {
+                        var l1 = slg.Sensorlogs
+                            .Where(e => e.SlogTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.SlogTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                            .MaxBy(e => e.SlogTime);
+                        var l2 = slg.Sensorlogs
+                            .Where(e => e.SlogTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.SlogTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                            .MinBy(e => e.SlogTime);
+                        if (l1 == null || l2 == null)
+                        {
+                            v += 0.0M;
+                        }
+                        else
+                        {
+                            v += l2.SlogValue - l1.SlogValue;
+                        }
+                    }
+                    Console.WriteLine("%v %v", k, v);
+                    ret.data.Add(new SensorUsedRecord(k, v));
+                }
+
             }
             catch (Exception)
             {
