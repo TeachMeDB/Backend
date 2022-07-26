@@ -399,6 +399,10 @@ namespace youAreWhatYouEat.Models
                     .IsUnicode(false)
                     .HasColumnName("OCCUPATION");
 
+                entity.Property(e =>e.Birthday)
+                    .HasColumnType("DATE")
+                    .HasColumnName("BIRTHDAY");
+
                 entity.HasOne(d => d.OccupationNavigation)
                     .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.Occupation)

@@ -23,6 +23,7 @@ namespace youAreWhatYouEat.Controllers
             public string? Name { get; set; }
             public string? Gender { get; set; }
             public string? Occupation { get; set; }
+            public string? Birthday { get; set; }
             public decimal? Attendance_rate { get; set; }
             public int? Award_times { get; set; }
             public string? avatar { get; set; }
@@ -57,6 +58,7 @@ namespace youAreWhatYouEat.Controllers
                 data.Add("name", null);
                 data.Add("gender", null);
                 data.Add("occupation", null);
+                data.Add("birthday", null);
                 data.Add("avatar", null);
                 data.Add("cover", null);
             }
@@ -72,7 +74,7 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取所有员工的信息
         [HttpGet("GetAllEmployeeInfo")]
-        public async Task<List<EmployeeInfo>> GetAllEmployeeInfo()
+        public async Task<ActionResult<List<EmployeeInfo>>> GetAllEmployeeInfo()
         {
             var employeeInfo = await _context.Employees
                 .Include(e => e.Attends)
@@ -87,6 +89,7 @@ namespace youAreWhatYouEat.Controllers
                 tem.Name = employee.Name;
                 tem.Gender = employee.Gender;
                 tem.Occupation = employee.Occupation;
+                tem.Birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
                 tem.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + tem.Id.ToString() + ".jpg";
 
                 decimal tot = 0, participant = 0;
@@ -103,14 +106,14 @@ namespace youAreWhatYouEat.Controllers
             }
 
             info.Sort((x, y) => { return x.Id.CompareTo(y.Id); });
-            HttpContext.Response.StatusCode = 200;
-            return info;
+            return Ok(info);
         }
 
         // GET 获取一位员工的信息
         [HttpGet("GetOneEmployeeInfo/{id}")]
-        public async Task<EmployeeMessage> GetOneEmployeeInfo(decimal id)
+        public async Task<ActionResult<EmployeeMessage>> GetOneEmployeeInfo(decimal? id)
         {
+            if (id == null) return BadRequest();
             EmployeeMessage message = new EmployeeMessage();
 
             var employee = await _context.Employees
@@ -120,11 +123,8 @@ namespace youAreWhatYouEat.Controllers
                 .Include(e => e.Prizes)
                     .ThenInclude(p => p.LvNavigation)
                 .SingleOrDefaultAsync(x => x.Id == id);
-            if (employee == null)
-            {
-                HttpContext.Response.StatusCode = 404;
-                return message;
-            }
+            if (employee == null) return NotFound();
+
             var salary = await _context.Salaries
                 .FirstOrDefaultAsync(s => s.Occupation == employee.Occupation.ToString());
             decimal amount = (decimal)salary.Amount;
@@ -133,6 +133,7 @@ namespace youAreWhatYouEat.Controllers
             message.data["name"] = employee.Name;
             message.data["gender"] = employee.Gender;
             message.data["occupation"] = employee.Occupation;
+            message.data["birthday"] = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
             message.data["avatar"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
             message.data["cover"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".jpg";
             message.data.Add("attends", new List<AttendInfo>());
@@ -173,8 +174,7 @@ namespace youAreWhatYouEat.Controllers
             }
             message.data["payrolls"] = payrolls;
 
-            HttpContext.Response.StatusCode = 200;
-            return message;
+            return Ok(message);
         }
 
         // POST 删除或修改员工信息
@@ -185,38 +185,28 @@ namespace youAreWhatYouEat.Controllers
 
         // DELETE 删除一条员工信息
         [HttpDelete("DeleteEmployeeInfo/{id}")]
-        public async Task<ModifyMessage> DeleteEmployeeInfo(int? id)
+        public async Task<ActionResult<ModifyMessage>> DeleteEmployeeInfo(int? id)
         {
             ModifyMessage message = new ModifyMessage();
             decimal? del_id = Convert.ToDecimal(id);
-            if (del_id == null)
-            {
-                HttpContext.Response.StatusCode = 400;
-                return message;
-            }
+            if (del_id == null) return BadRequest();
 
             var employee = await _context.Employees.FindAsync(del_id);
-            if (employee == null)
-            {
-                HttpContext.Response.StatusCode = 404;
-                return message;
-            }
+            if (employee == null) return NotFound();
 
             try
             {
                 _context.Employees.Remove(employee);
                 await _context.SaveChangesAsync();
-                HttpContext.Response.StatusCode= 200;
                 message.data["success"] = true;
             }
             catch (DbUpdateException ex)
             {
                 Console.WriteLine(ex.ToString());
-                HttpContext.Response.StatusCode = 502;
-                return message;
+                return Forbid();
             }
 
-            return message;
+            return Ok(message);
         }
     }
 }
