@@ -50,11 +50,9 @@ namespace youAreWhatYouEat.Controllers
 
         public class EmployeeMessage
         {
-            public int errorCode { get; set; }
             public Dictionary<string, dynamic> data { get; set; } = new Dictionary<string, dynamic>();
             public EmployeeMessage()
             {
-                errorCode = 300;
                 data.Add("id", null);
                 data.Add("name", null);
                 data.Add("gender", null);
@@ -63,7 +61,16 @@ namespace youAreWhatYouEat.Controllers
                 data.Add("cover", null);
             }
         }
+        public class ModifyMessage
+        {
+            public Dictionary<string, dynamic> data { get; set; } = new Dictionary<string, dynamic>();
+            public ModifyMessage()
+            {
+                data.Add("success", false);
+            }
+        }
 
+        // GET 获取所有员工的信息
         [HttpGet("GetAllEmployeeInfo")]
         public async Task<List<EmployeeInfo>> GetAllEmployeeInfo()
         {
@@ -96,9 +103,11 @@ namespace youAreWhatYouEat.Controllers
             }
 
             info.Sort((x, y) => { return x.Id.CompareTo(y.Id); });
+            HttpContext.Response.StatusCode = 200;
             return info;
         }
 
+        // GET 获取一位员工的信息
         [HttpGet("GetOneEmployeeInfo/{id}")]
         public async Task<EmployeeMessage> GetOneEmployeeInfo(decimal id)
         {
@@ -111,7 +120,11 @@ namespace youAreWhatYouEat.Controllers
                 .Include(e => e.Prizes)
                     .ThenInclude(p => p.LvNavigation)
                 .SingleOrDefaultAsync(x => x.Id == id);
-            if (employee == null) return message;
+            if (employee == null)
+            {
+                HttpContext.Response.StatusCode = 404;
+                return message;
+            }
             var salary = await _context.Salaries
                 .FirstOrDefaultAsync(s => s.Occupation == employee.Occupation.ToString());
             decimal amount = (decimal)salary.Amount;
@@ -160,20 +173,50 @@ namespace youAreWhatYouEat.Controllers
             }
             message.data["payrolls"] = payrolls;
 
-            message.errorCode = 200;
+            HttpContext.Response.StatusCode = 200;
             return message;
         }
 
-        // POST api/<EmployeeController>
+        // POST 删除或修改员工信息
         [HttpPost("PostEmployeeInfo")]
         public void PostEmployeeInfo([FromBody] string value)
         {
         }
 
-        // DELETE api/<EmployeeController>/5
+        // DELETE 删除一条员工信息
         [HttpDelete("DeleteEmployeeInfo/{id}")]
-        public void DeleteEmployeeInfo(int id)
+        public async Task<ModifyMessage> DeleteEmployeeInfo(int? id)
         {
+            ModifyMessage message = new ModifyMessage();
+            decimal? del_id = Convert.ToDecimal(id);
+            if (del_id == null)
+            {
+                HttpContext.Response.StatusCode = 400;
+                return message;
+            }
+
+            var employee = await _context.Employees.FindAsync(del_id);
+            if (employee == null)
+            {
+                HttpContext.Response.StatusCode = 404;
+                return message;
+            }
+
+            try
+            {
+                _context.Employees.Remove(employee);
+                await _context.SaveChangesAsync();
+                HttpContext.Response.StatusCode= 200;
+                message.data["success"] = true;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                HttpContext.Response.StatusCode = 502;
+                return message;
+            }
+
+            return message;
         }
     }
 }
