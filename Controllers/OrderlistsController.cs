@@ -6,6 +6,32 @@ using Newtonsoft.Json.Linq;
 
 namespace youAreWhatYouEat.Controllers
 {
+    public class UnixTimeUtil
+    {
+        /// <summary>
+        /// 将dateTime格式转换为Unix时间戳
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static int DateTimeToUnixTime(DateTime dateTime)
+        {
+            return (int)(dateTime - TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1))).TotalSeconds;
+        }
+
+        /// <summary>
+        /// 将Unix时间戳转换为dateTime格式
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static DateTime UnixTimeToDateTime(int time)
+        {
+            if (time < 0)
+                throw new ArgumentOutOfRangeException("time is out of range");
+
+            return TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1)).AddSeconds(time);
+        }
+    }
+
     [Route("api/[controller]")]
     [ApiController]
     public class OrderlistsController : ControllerBase
@@ -32,32 +58,6 @@ namespace youAreWhatYouEat.Controllers
                 {
                     return "Hello";
                 }*/
-
-        public class UnixTimeUtil
-        {
-            /// <summary>
-            /// 将dateTime格式转换为Unix时间戳
-            /// </summary>
-            /// <param name="dateTime"></param>
-            /// <returns></returns>
-            public static int DateTimeToUnixTime(DateTime dateTime)
-            {
-                return (int)(dateTime - TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1))).TotalSeconds;
-            }
-
-            /// <summary>
-            /// 将Unix时间戳转换为dateTime格式
-            /// </summary>
-            /// <param name="time"></param>
-            /// <returns></returns>
-            public static DateTime UnixTimeToDateTime(int time)
-            {
-                if (time < 0)
-                    throw new ArgumentOutOfRangeException("time is out of range");
-
-                return TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1)).AddSeconds(time);
-            }
-        }
 
         public class OrderListMessage
         {

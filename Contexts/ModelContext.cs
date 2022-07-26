@@ -52,6 +52,7 @@ namespace youAreWhatYouEat.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseOracle(System.Configuration.ConfigurationManager.ConnectionStrings["OracleDatabase"].ConnectionString);
+                /*optionsBuilder.UseOracle("********************************************************************");*/
             }
         }
 
