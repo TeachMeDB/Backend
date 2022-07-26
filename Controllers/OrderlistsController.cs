@@ -19,12 +19,12 @@ namespace youAreWhatYouEat.Controllers
 
         public class OrderInfo
         {
-            public decimal Id { get; set; }
-            public int? Time { get; set; }
-            public string? Table { get; set; }
-            public string? Status { get; set; }
-            public decimal? Payment { get; set; }
-            public decimal? Discount { get; set; }
+            public string? order_id { get; set; }
+            public string? creation_time { get; set; }
+            public string? table_id { get; set; }
+            public string? order_status { get; set; }
+            public decimal? final_payment { get; set; }
+            public decimal? discount_price { get; set; }
         }
 
         /*        [HttpGet("Hello")]
@@ -64,8 +64,7 @@ namespace youAreWhatYouEat.Controllers
         public OrderListMessage GetOrderlist(int begin = 0, int end = 2147483647)
         {
             OrderListMessage orderListMessage = new OrderListMessage();
-            OrderListSummaryMessage orderListSummaryMessage = new OrderListSummaryMessage();
-            List<OrderMessage> orderMessages = new List<OrderMessage>();
+            List<OrderInfo> orderMessages = new List<OrderInfo>();
 
             IEnumerable<Orderlist> orderListInfo = _context.Orderlists
                 .Where(e => e.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
@@ -77,31 +76,29 @@ namespace youAreWhatYouEat.Controllers
 
             foreach (Orderlist o in orderListInfo)
             {
-                OrderMessage om = new OrderMessage();
-                om.data["order_id"] = o.OrderId;
-                om.data["creation_time"] = o.CreationTime.ToString();
-                om.data["table_id"] = o.TableId;
-                om.data["order_status"] = o.OrderStatus;
+                OrderInfo om = new OrderInfo();
+                om.order_id = o.OrderId;
+                om.creation_time = o.CreationTime.ToString();
+                om.table_id = o.TableId.ToString();
+                om.order_status = o.OrderStatus;
                 decimal price = 0.0M;
                 foreach (Dishorderlist c in o.Dishorderlists)
                 {
                     price += c.FinalPayment;
                 }
-                om.data["final_payment"] = price;
-                om.data["discount_price"] = 0;
-                orderMessages.Add(om);
+                om.final_payment = price;
+                om.discount_price = 0;
+                orderListMessage.orders.Add(om);
                 tot_cnt++;
                 tot_cre += price;
             }
 
-            orderListSummaryMessage.errorCode = 200;
-            orderListSummaryMessage.data["order_count"] = tot_cnt;
-            orderListSummaryMessage.data["total_credit"] = tot_cre;
+            orderListMessage.summary["order_count"] = tot_cnt;
+            orderListMessage.summary["total_credit"] = tot_cre;
 
             orderListMessage.errorCode = 200;
-            orderListMessage.data["data"] = orderMessages;
-            orderListMessage.data["summary"] = orderListSummaryMessage;
-
+            if (tot_cnt <= 0)
+                orderListMessage.errorCode = 404;
             return orderListMessage;
         }
         private bool OrderlistExists(string id)

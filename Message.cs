@@ -38,7 +38,6 @@ namespace youAreWhatYouEat
     {
         public OrderMessage()
         {
-            errorCode = 300;
             data.Add("order_id", null);
             data.Add("creation_time", null);
             data.Add("table_id", null);
@@ -52,19 +51,21 @@ namespace youAreWhatYouEat
     {
         public OrderListSummaryMessage()
         {
-            errorCode = 300;
             data.Add("order_count", null);
             data.Add("total_credit", null);
         }
     }
 
-    public class OrderListMessage : Message
+    public class OrderListMessage
     {
+        public Dictionary<string, dynamic> summary { get; set; } = new Dictionary<string, dynamic>();
+        public List<dynamic> orders { get; set; } = new List<dynamic>();
+
+        public int errorCode = 0;
         public OrderListMessage()
         {
-            errorCode = 300;
-            data.Add("data", null);
-            data.Add("summary", null);
+            summary["order_count"] = 0;
+            summary["total_credit"] = 0;
         }
     }
 }
