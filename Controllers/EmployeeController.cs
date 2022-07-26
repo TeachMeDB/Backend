@@ -47,6 +47,20 @@ namespace youAreWhatYouEat.Controllers
             public decimal? amount { get; set; }
         }
 
+        public class EmployeeMessage
+        {
+            public int errorCode { get; set; }
+            public Dictionary<string, dynamic> data { get; set; } = new Dictionary<string, dynamic>();
+            public EmployeeMessage()
+            {
+                errorCode = 300;
+                data.Add("id", null);
+                data.Add("name", null);
+                data.Add("gender", null);
+                data.Add("occupation", null);
+            }
+        }
+
         [HttpGet("GetAllEmployeeInfo")]
         public List<EmployeeInfo> GetAllEmployeeInfo()
         {
@@ -81,7 +95,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetOneEmployeeInfo/{id}")]
-        public string GetOneEmployeeInfo(decimal id)
+        public EmployeeMessage GetOneEmployeeInfo(decimal id)
         {
             EmployeeMessage message = new EmployeeMessage();
 
@@ -140,7 +154,7 @@ namespace youAreWhatYouEat.Controllers
             message.data["payrolls"] = payrolls;
 
             message.errorCode = 200;
-            return message.ReturnJson(); ;
+            return message;
         }
 
         // POST api/<EmployeeController>
