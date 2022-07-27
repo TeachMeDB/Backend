@@ -101,9 +101,9 @@ namespace youAreWhatYouEat.Controllers
             return Ok(ret);
         }
 
-        // GET: api/Sensors/rawdata
+        // GET: api/Sensors/used
         [HttpGet("used")]
-        public async Task<ActionResult<SensorsGetRawDataMessage>> GetUsedResource(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<SensorsGetUsedResourcesMessage>> GetUsedResource(int begin = 0, int end = 2147483647)
         {
             if (_context.Sensors == null)
             {
@@ -114,7 +114,8 @@ namespace youAreWhatYouEat.Controllers
             ret.end = UnixTimeUtil.UnixTimeToDateTime(end);
             try
             {
-                foreach (var s in _context.Sensors.Include(e => e.Sensorlogs).GroupBy(e => e.SensType))
+                List<Sensor> lll = await _context.Sensors.Include(e => e.Sensorlogs).ToListAsync();
+                foreach (var s in lll.GroupBy(e => e.SensType))
                 {
                     var k = s.Key;
                     decimal v = 0.0M;
@@ -132,7 +133,7 @@ namespace youAreWhatYouEat.Controllers
                         }
                         else
                         {
-                            v += l2.SlogValue - l1.SlogValue;
+                            v += l1.SlogValue - l2.SlogValue;
                         }
                     }
                     Console.WriteLine("%v %v", k, v);
