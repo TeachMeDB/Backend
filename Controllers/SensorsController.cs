@@ -136,7 +136,6 @@ namespace youAreWhatYouEat.Controllers
                             v += l1.SlogValue - l2.SlogValue;
                         }
                     }
-                    Console.WriteLine("%v %v", k, v);
                     ret.data.Add(new SensorUsedRecord(k, v));
                 }
 
