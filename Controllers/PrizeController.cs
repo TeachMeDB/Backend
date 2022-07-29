@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using youAreWhatYouEat.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,33 +10,54 @@ namespace youAreWhatYouEat.Controllers
     [ApiController]
     public class PrizeController : ControllerBase
     {
-        // GET: api/<PrizeController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ModelContext _context;
+        public PrizeController()
         {
-            return new string[] { "value1", "value2" };
+            _context = new ModelContext();
         }
 
-        // GET api/<PrizeController>/5
+        public class PrizeInfo
+        {
+            public string level { get; set; }
+            public decimal? amount { get; set; }
+            public decimal? summary { get; set; }
+        }
+
+        // GET 获取奖金信息
+        [HttpGet("GetPrizeInfo")]
+        public async Task<ActionResult<List<PrizeInfo>>> GetPrizeInfo()
+        {
+            var prizes = await _context.Awards
+                .Include(a => a.Prizes)
+                .ToListAsync();
+
+            List<PrizeInfo> prizeInfos = new List<PrizeInfo>();
+            foreach(var priz in prizes)
+            {
+                PrizeInfo p = new PrizeInfo();
+                p.level = priz.Lv;
+                p.amount = priz.Amount;
+                p.summary = priz.Prizes.Count;
+                prizeInfos.Add(p);
+            }
+
+            return Ok(prizeInfos);
+        }
+
+        // GET 获取获奖记录
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST api/<PrizeController>
+        // POST 增加/更新一条奖金级别
         [HttpPost]
         public void Post([FromBody] string value)
         {
         }
 
-        // PUT api/<PrizeController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/<PrizeController>/5
+        // DELETE  删除一个奖金级别
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
