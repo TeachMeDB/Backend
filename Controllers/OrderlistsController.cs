@@ -175,7 +175,7 @@ namespace youAreWhatYouEat.Controllers
         {
             public int vip_number { get; set; }
             public int vip_order_number { get; set; }
-            public int vip_total_credit { get; set; }
+            public decimal vip_total_credit { get; set; } = 0.0M;
         }
 
         public class VipOrderMessage
@@ -216,6 +216,7 @@ namespace youAreWhatYouEat.Controllers
                         ret.summary.vip_order_number += 1;
                     }
                     ret.summary.vip_number += 1;
+                    ret.summary.vip_total_credit += datum.total_credit;
                     ret.data.Add(datum);
                 }
             }
