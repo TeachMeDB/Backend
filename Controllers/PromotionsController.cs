@@ -52,6 +52,21 @@ namespace youAreWhatYouEat.Controllers
             public List<PromotionDishRecord> dishes { get; set; } = new List<PromotionDishRecord>();
         }
 
+        public class PromotionPostDishRecord
+        {
+            public string? name { get; set; } = null!;
+            public decimal discount { get; set; } = 1.0M;
+        }
+
+        public class PromotionPostRecord
+        {
+            public decimal? promotion_id { get; set; }
+            public DateTime? begin { get; set; }
+            public DateTime? end { get; set; }
+            public string? description { get; set; } = null!;
+            public List<PromotionPostDishRecord> dishes { get; set; } = new List<PromotionPostDishRecord>();
+        }
+
 
         // GET: api/Promotions
         [HttpGet]
@@ -86,30 +101,55 @@ namespace youAreWhatYouEat.Controllers
         // POST: api/Promotions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Promotion>> PostPromotion(Promotion promotion)
+        public async Task<ActionResult<Promotion>> PostPromotion(PromotionPostRecord p)
         {
             if (_context.Promotions == null)
             {
                 return Problem("Entity set 'ModelContext.Promotions'  is null.");
             }
-            _context.Promotions.Add(promotion);
+
+            var ret = new Promotion();
+            ret.PromotionId = 1 + await _context.Promotions.CountAsync();
+            ret.StartTime = p.begin;
+            ret.EndTime = p.end;
+            ret.Description = p.description;
+
+            if (p.promotion_id != null)
+            {
+                ret.PromotionId = (decimal)p.promotion_id;
+                var promotion = await _context.Promotions.FindAsync(p.promotion_id);
+                if (promotion == null)
+                {
+                    return NotFound();
+                }
+                _context.Promotions.Remove(promotion);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException)
+                {
+                    throw;
+                }
+            }
+            foreach (var di in p.dishes)
+            {
+                Hasdish nd = new Hasdish();
+                nd.Dish = _context.Dishes.Where(e => e.DishName == di.name).First();
+                nd.Discount = di.discount;
+                ret.Hasdishes.Add(nd);
+            }
+            _context.Promotions.Add(ret);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (PromotionExists(promotion.PromotionId))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return CreatedAtAction("GetPromotion", new { id = promotion.PromotionId }, promotion);
+            return Ok();
         }
 
         // DELETE: api/Promotions/5
