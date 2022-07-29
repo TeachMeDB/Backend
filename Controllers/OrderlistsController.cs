@@ -110,7 +110,7 @@ namespace youAreWhatYouEat.Controllers
                         var pd = pi.Hasdishes.ToDictionary(e => e.DishId);
                         if (pd.ContainsKey(c.DishId))
                         {
-                            if (pd[c.DishId].Discount != null && c.Dish.DishPrice!= null)
+                            if (pd[c.DishId].Discount != null && c.Dish.DishPrice != null)
                             {
                                 if (discount_dict.ContainsKey(c.DishId))
                                 {
@@ -167,7 +167,8 @@ namespace youAreWhatYouEat.Controllers
             int tot_cnt = 0;
             decimal tot_cre = 0;
 
-            var p = await _context.Promotions.Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+            var p = await _context.Promotions
+                .Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
                 .Include(e => e.Hasdishes)
                 .ToListAsync();
 
@@ -221,6 +222,92 @@ namespace youAreWhatYouEat.Controllers
                 orderListMessage.errorCode = 404;
             return orderListMessage;
         }
+
+
+        public class DishOrderInfo
+        {
+            public string? dish_order_id { get; set; }
+            public string? order_id { get; set; }
+            public DateTime? order_creation_time { get; set; }
+            public decimal? dish_id { get; set; }
+            public string? dish_status { get; set; }
+            public decimal? final_payment { get; set; }
+        }
+
+        public class DishOrderInfoReply
+        {
+            public int code { get; set; } = 200;
+            public List<DishOrderInfo>? data { get; set; } = null!;
+        }
+
+        [HttpGet("GetDishordersByTime")]
+        public async Task<ActionResult<DishOrderInfoReply>> GetDishorderlist(int begin = 0, int end = 2147483647)
+        {
+            var l = await _context.Dishorderlists
+                .Where(e => e.Order.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.Order.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Include(e => e.Dish)
+                .Include(e => e.Order)
+                .ToListAsync();
+            DishOrderInfoReply ret = new DishOrderInfoReply();
+            ret.data = new List<DishOrderInfo>();
+            foreach (var dol in l)
+            {
+                DishOrderInfo t = new DishOrderInfo();
+                t.dish_order_id = dol.DishOrderId;
+                t.order_id = dol.OrderId;
+                t.order_creation_time = dol.Order.CreationTime;
+                t.dish_id = dol.DishId;
+                t.dish_status = dol.DishStatus;
+                t.final_payment = dol.FinalPayment;
+                ret.data.Add(t);
+            }
+
+            return ret;
+        }
+
+        public class DishOrderNumInfo
+        {
+            public string? name { get; set; }
+            public decimal? dish_id { get; set; }
+            public List<string> tags { get; set; } = new List<string>();
+            public decimal? price { get; set; }
+            public int order_times { get; set; }
+            public decimal? total_credit { get; set; }
+        }
+        public class DishOrderNumInfoReply
+        {
+            public int code { get; set; } = 200;
+            public List<DishOrderNumInfo>? data { get; set; } = null!;
+        }
+
+        [HttpGet("GetDishOrderNum")]
+        public async Task<ActionResult<DishOrderNumInfoReply>> GetDishOrderNum(int begin = 0, int end = 2147483647)
+        {
+            var l = _context.Dishorderlists
+                .Where(e => e.Order.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.Order.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .ToList()
+                .GroupBy(e => e.DishId);
+            DishOrderNumInfoReply ret = new DishOrderNumInfoReply();
+            ret.data = new List<DishOrderNumInfo>();
+            var dish = await _context.Dishes.Include(e => e.Dtags).ToDictionaryAsync(e => e.DishId);
+            foreach (var d in l)
+            {
+                DishOrderNumInfo i = new DishOrderNumInfo();
+                i.name = dish[d.Key].DishName;
+                i.dish_id = d.Key;
+                i.price = dish[d.Key].DishPrice;
+                foreach (var tag in dish[d.Key].Dtags)
+                {
+                    i.tags.Add(tag.DtagName);
+                }
+                i.order_times = d.Count();
+                i.total_credit = d.Count() * i.price;
+                ret.data.Add(i);
+            }
+
+            return ret;
+        }
+
         private bool OrderlistExists(string id)
         {
             return (_context.Orderlists?.Any(e => e.OrderId == id)).GetValueOrDefault();
