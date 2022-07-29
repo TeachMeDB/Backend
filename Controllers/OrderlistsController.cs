@@ -74,18 +74,23 @@ namespace youAreWhatYouEat.Controllers
 
         // GET: api/Orderlists/GetOrdersByTime
         [HttpGet("GetOrdersByTime")]
-        public OrderListMessage GetOrderlist(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<OrderListMessage>> GetOrderlist(int begin = 0, int end = 2147483647)
         {
             OrderListMessage orderListMessage = new OrderListMessage();
             List<OrderInfo> orderMessages = new List<OrderInfo>();
 
-            IEnumerable<Orderlist> orderListInfo = _context.Orderlists
+            IEnumerable<Orderlist> orderListInfo = await _context.Orderlists
                 .Where(e => e.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
                 .Include(e => e.Dishorderlists)
-                .ToList();
+                .ThenInclude(e => e.Dish)
+                .ToListAsync();
 
             int tot_cnt = 0;
             decimal tot_cre = 0;
+
+            var p = await _context.Promotions.Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Include(e => e.Hasdishes)
+                .ToListAsync();
 
             foreach (Orderlist o in orderListInfo)
             {
@@ -95,12 +100,114 @@ namespace youAreWhatYouEat.Controllers
                 om.table_id = o.TableId.ToString();
                 om.order_status = o.OrderStatus;
                 decimal price = 0.0M;
+                decimal discount_price = 0.0M;
+                Dictionary<decimal, decimal> discount_dict = new Dictionary<decimal, decimal>();
                 foreach (Dishorderlist c in o.Dishorderlists)
                 {
                     price += c.FinalPayment;
+                    foreach (var pi in p)
+                    {
+                        var pd = pi.Hasdishes.ToDictionary(e => e.DishId);
+                        if (pd.ContainsKey(c.DishId))
+                        {
+                            if (pd[c.DishId].Discount != null && c.Dish.DishPrice!= null)
+                            {
+                                if (discount_dict.ContainsKey(c.DishId))
+                                {
+                                    if (discount_dict[c.DishId] > pd[c.DishId].Discount * c.Dish.DishPrice)
+                                    {
+                                        discount_dict[c.DishId] = (decimal)pd[c.DishId].Discount * c.Dish.DishPrice;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (var d in discount_dict)
+                {
+                    discount_price += d.Value;
                 }
                 om.final_payment = price;
-                om.discount_price = 0;
+                om.discount_price = discount_price;
+                orderListMessage.orders.Add(om);
+                tot_cnt++;
+                tot_cre += price;
+            }
+
+            orderListMessage.summary["order_count"] = tot_cnt;
+            orderListMessage.summary["total_credit"] = tot_cre;
+
+            orderListMessage.errorCode = 200;
+            if (tot_cnt <= 0)
+                orderListMessage.errorCode = 404;
+            return orderListMessage;
+        }
+
+        // GET: api/Orderlists/GetVipOrdersByTime
+        [HttpGet("GetVipOrdersByTime")]
+        public async Task<ActionResult<OrderListMessage>> GetVipOrderlist(int begin = 0, int end = 2147483647)
+        {
+            var ono = await _context.OrderNumbers
+                .Where(e => e.OrderDate >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.OrderDate <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Where(e => e.UserName != "default01")
+                .Include(e => e.Order)
+                .ThenInclude(e => e.Dishorderlists)
+                .ThenInclude(e => e.Dish)
+                .ToListAsync();
+
+            OrderListMessage orderListMessage = new OrderListMessage();
+            List<OrderInfo> orderMessages = new List<OrderInfo>();
+
+            List<Orderlist> orderListInfo = new List<Orderlist>();
+            foreach (var o in ono)
+            {
+                orderListInfo.Add(o.Order);
+            }
+
+            int tot_cnt = 0;
+            decimal tot_cre = 0;
+
+            var p = await _context.Promotions.Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Include(e => e.Hasdishes)
+                .ToListAsync();
+
+            foreach (Orderlist o in orderListInfo)
+            {
+                OrderInfo om = new OrderInfo();
+                om.order_id = o.OrderId;
+                om.creation_time = o.CreationTime.ToString();
+                om.table_id = o.TableId.ToString();
+                om.order_status = o.OrderStatus;
+                decimal price = 0.0M;
+                decimal discount_price = 0.0M;
+                Dictionary<decimal, decimal> discount_dict = new Dictionary<decimal, decimal>();
+                foreach (Dishorderlist c in o.Dishorderlists)
+                {
+                    price += c.FinalPayment;
+                    foreach (var pi in p)
+                    {
+                        var pd = pi.Hasdishes.ToDictionary(e => e.DishId);
+                        if (pd.ContainsKey(c.DishId))
+                        {
+                            if (pd[c.DishId].Discount != null && c.Dish.DishPrice != null)
+                            {
+                                if (discount_dict.ContainsKey(c.DishId))
+                                {
+                                    if (discount_dict[c.DishId] > pd[c.DishId].Discount * c.Dish.DishPrice)
+                                    {
+                                        discount_dict[c.DishId] = (decimal)pd[c.DishId].Discount * c.Dish.DishPrice;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (var d in discount_dict)
+                {
+                    discount_price += d.Value;
+                }
+                om.final_payment = price;
+                om.discount_price = discount_price;
                 orderListMessage.orders.Add(om);
                 tot_cnt++;
                 tot_cre += price;
