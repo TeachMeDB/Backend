@@ -36,6 +36,13 @@ namespace youAreWhatYouEat.Controllers
             public List<PeopleInfo>? peoples { get; set; }
         }
 
+        public class EmployeeInfo2
+        {
+            public string id { get; set; }
+            public string? name { get; set; }
+            public string? gender { get; set; }
+        }
+
         public class ScheduleMessage
         {
             public List<ScheduleInfo> data { get; set; } = new List<ScheduleInfo>();
@@ -105,10 +112,46 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // GET 获取可排班人员
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("GetFreeEmployee")]
+        public async Task<ActionResult<List<EmployeeInfo2>>> GetFreeEmployee(string? start, string? end, string? place, string? occupation)
         {
-            return "value";
+            DateTime start_date, end_date;
+            if (start != null) start_date = Convert.ToDateTime(start);
+            else start_date = DateTime.MinValue;
+            if (end != null) end_date = Convert.ToDateTime(end);
+            else end_date = DateTime.MaxValue;
+
+            var workInfo = await _context.WorkPlans
+                .Include(e => e.Attends)
+                .Where(w => (w.TimeStart <= end_date && w.TimeEnd >= start_date))
+                .ToListAsync();
+            List<decimal> busyIds = new List<decimal>();
+            foreach(var work in workInfo)
+            {
+                foreach(var attend in work.Attends)
+                {
+                    if (!busyIds.Exists(b => b == attend.EmployeeId))
+                        busyIds.Add(attend.EmployeeId);
+                }
+            }
+
+            var employees = await _context.Employees.ToListAsync();
+            List<EmployeeInfo2> info = new List<EmployeeInfo2>();
+
+            foreach(var employee in employees)
+            {
+                if ((occupation == null || employee.Occupation == occupation) && !busyIds.Exists(b => b == employee.Id))
+                {
+                    EmployeeInfo2 emp = new EmployeeInfo2();
+                    emp.id = employee.Id.ToString();
+                    emp.name = employee.Name;
+                    emp.gender = employee.Gender;
+                    info.Add(emp);
+                }
+            }
+
+            if (info.Count == 0) return NotFound();
+            return Ok(info);
         }
 
         // POST 增加一条排班记录
