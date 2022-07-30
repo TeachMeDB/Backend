@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace youAreWhatYouEat.Controllers
 {
@@ -72,6 +74,17 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
+        public class EmployeePostInfo
+        {
+            public string? id { get; set; }
+            public string? name { get; set; }
+            public string? gender { get; set; }
+            public string? occupation { get; set; }
+            public string? birthday { get; set; }
+            public string? avatar { get; set; }
+            public string? cover { get; set; }
+        }
+
         // GET 获取所有员工的信息
         [HttpGet("GetAllEmployeeInfo")]
         public async Task<ActionResult<List<EmployeeInfo>>> GetAllEmployeeInfo()
@@ -89,7 +102,8 @@ namespace youAreWhatYouEat.Controllers
                 tem.Name = employee.Name;
                 tem.Gender = employee.Gender;
                 tem.Occupation = employee.Occupation;
-                tem.Birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
+                if (employee.Birthday != null) tem.Birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
+                else tem.Birthday = null;
                 tem.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + tem.Id.ToString() + ".jpg";
 
                 decimal tot = 0, participant = 0;
@@ -125,16 +139,21 @@ namespace youAreWhatYouEat.Controllers
                 .SingleOrDefaultAsync(x => x.Id == id);
             if (employee == null) return NotFound();
 
-            var salary = await _context.Salaries
-                .FirstOrDefaultAsync(s => s.Occupation == employee.Occupation.ToString());
-            decimal amount = (decimal)salary.Amount;
+            decimal amount = 0;
+            if (employee.Occupation != null)
+            {
+                var salary = await _context.Salaries
+                    .FirstOrDefaultAsync(s => s.Occupation == employee.Occupation.ToString());
+                amount = (decimal)salary.Amount;
+            }
 
             message.data["id"] = employee.Id.ToString();
             message.data["name"] = employee.Name;
             message.data["gender"] = employee.Gender;
             message.data["occupation"] = employee.Occupation;
-            message.data["birthday"] = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
-            message.data["avatar"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
+            if (employee.Birthday != null) message.data["birthday"] = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
+            else message.data["birthday"] = null;
+           message.data["avatar"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
             message.data["cover"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".jpg";
             message.data.Add("attends", new List<AttendInfo>());
             message.data.Add("payrolls", new List<PayrollInfo>());
@@ -179,8 +198,106 @@ namespace youAreWhatYouEat.Controllers
 
         // POST 删除或修改员工信息
         [HttpPost("PostEmployeeInfo")]
-        public void PostEmployeeInfo([FromBody] string value)
+        public async Task<ActionResult<bool>> PostEmployeeInfo(EmployeePostInfo p)
         {
+            try
+            {
+                string? id = p.id;
+                string? name = p.name;
+                string? gender = p.gender;
+                string? occupation = p.occupation;
+                string? birthday = p.birthday;
+                string? avatar = p.avatar;
+                string? cover = p.cover;
+
+                if (id != null)
+                {
+                    try
+                    {
+                        var employee = await _context.Employees
+                            .FirstOrDefaultAsync(x => x.Id.ToString() == id);
+                        if (employee == null)
+                        {
+                            return NotFound();
+                        }
+                        if (name != null) employee.Name = name;
+                        if (gender != null) employee.Gender = gender;
+                        if (occupation != null) employee.Occupation = occupation;
+                        if (birthday != null) employee.Birthday = Convert.ToDateTime(birthday);
+
+                        _context.SaveChanges();
+                        if (avatar != null)
+                        {
+                            byte[] base64 = Convert.FromBase64String(avatar);
+                            string path = "/images/employees/employee_" + id + ".jpg";
+                            System.IO.File.WriteAllBytes(path, base64);
+                        }
+                        if (cover != null)
+                        {
+                            byte[] base64 = Convert.FromBase64String(cover);
+                            string path = "/images/covers/cover_" + id + ".jpg";
+                            System.IO.File.WriteAllBytes(path, base64);
+                        }
+                        return Ok(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex);
+                    }
+                } else
+                {
+                    try
+                    {
+                        var employees = _context.Employees
+                            .OrderBy(e => e.Id);
+
+                        decimal newId = 1001;
+                        Employee employee = new Employee();
+
+                        if (employees != null)
+                        {
+                            foreach (var emp in employees)
+                            {
+                                if (emp.Id != newId)
+                                {
+                                    break;
+                                }
+                                newId++;
+                            }
+                        }
+
+                        employee.Id = newId;
+                        employee.Name = name;
+                        if (gender != null) employee.Gender = gender;
+                        if (occupation != null) employee.Occupation = occupation;
+                        if (birthday != null) employee.Birthday = Convert.ToDateTime(birthday);
+
+                        _context.Employees.Add(employee);
+                        _context.SaveChanges();
+                        if (avatar != null)
+                        {
+                            byte[] base64 = Convert.FromBase64String(avatar);
+                            string path = "/images/employees/employee_" + id + ".jpg";
+                            System.IO.File.WriteAllBytes(path, base64);
+                        }
+                        if (cover != null)
+                        {
+                            byte[] base64 = Convert.FromBase64String(cover);
+                            string path = "/images/covers/cover_" + id + ".jpg";
+                            System.IO.File.WriteAllBytes(path, base64);
+                        }
+                        return Created("", true);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex);
+                    }
+                }
+            } catch (Exception e){ 
+                Console.WriteLine(e.Message);
+                return BadRequest();
+            }
+            return Ok(true);
         }
 
         // DELETE 删除一条员工信息
