@@ -119,7 +119,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // GET 获取一位员工的信息
-        [HttpGet("GetOneEmployeeInfo/{id}")]
+        [HttpGet("GetOneEmployeeInfo")]
         public async Task<ActionResult<EmployeeMessage>> GetOneEmployeeInfo(decimal? id)
         {
             if (id == null) return BadRequest();
@@ -293,7 +293,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // DELETE 删除一条员工信息
-        [HttpDelete("DeleteEmployeeInfo/{id}")]
+        [HttpDelete("DeleteEmployeeInfo")]
         public async Task<ActionResult<ModifyMessage>> DeleteEmployeeInfo(int? id)
         {
             ModifyMessage message = new ModifyMessage();

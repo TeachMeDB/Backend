@@ -148,7 +148,7 @@ namespace youAreWhatYouEat.Controllers
             public string? time { get; set; }
         }
 
-        // POST 增加/更新一个发奖记录
+        // POST 增加一个发奖记录
         [HttpPost("PostPrizeRecord")]
         public async Task<ActionResult> PostPrizeRecord(PostPrizeInfo p)
         {
@@ -171,7 +171,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
             // DELETE  删除一个奖金级别
-            [HttpDelete("DeleteAward/{level}")]
+            [HttpDelete("DeleteAward")]
         public async Task<ActionResult> DeleteAward(string? level)
         {
             if (level == null) return BadRequest();

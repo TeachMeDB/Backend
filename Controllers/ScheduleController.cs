@@ -196,7 +196,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // DELETE 删除一条排班记录
-        [HttpDelete("DeleteScheduleInfo /{id}")]
+        [HttpDelete("DeleteScheduleInfo")]
         public async Task<ActionResult<bool>> Delete(string? id)
         {
             decimal? del_id = Convert.ToDecimal(id);

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using youAreWhatYouEat.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +10,161 @@ namespace youAreWhatYouEat.Controllers
     [ApiController]
     public class SalaryController : ControllerBase
     {
-        // GET: api/<SalaryController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly ModelContext _context;
+        public SalaryController()
         {
-            return new string[] { "value1", "value2" };
+            _context = new ModelContext();
         }
 
-        // GET api/<SalaryController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        public class SalaryInfo
         {
-            return "value";
+            public string? occupation { get; set; }
+            public decimal? amount { get; set; }
+            public decimal? count { get; set; }
         }
 
-        // POST api/<SalaryController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // GET 获取工资级别信息
+        [HttpGet("GetSalaryInfo")]
+        public async Task<ActionResult<List<SalaryInfo>>> GetSalaryInfo()
         {
+            var salaries = await _context.Salaries
+                .Include(s => s.Employees)
+                .ToListAsync();
+
+            if (salaries == null) return NotFound();
+
+            List<SalaryInfo> salaryInfos = new List<SalaryInfo>();
+            foreach(var salary in salaries)
+            {
+                SalaryInfo salaryInfo = new SalaryInfo();
+                salaryInfo.occupation = salary.Occupation;
+                salaryInfo.amount = salary.Amount;
+                salaryInfo.count = salary.Employees.Count();
+                salaryInfos.Add(salaryInfo);
+            }
+
+            return Ok(salaryInfos);
         }
 
-        // PUT api/<SalaryController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public class SalaryRecord
         {
+            public string? id { get; set; }
+            public string? name { get; set; }
+            public string? occupation { get; set; }
+            public decimal? amount { get; set; }
+            public string? time { get; set; }
         }
 
-        // DELETE api/<SalaryController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // GET 获取所有发工资记录
+        [HttpGet("GetSalaryRecord")]
+        public async Task<ActionResult<List<SalaryRecord>>> GetSalaryRecord(string? occupation, string? id, string? time_start, string? time_end)
         {
+            var records = await _context.Payrolls
+                .Include(p => p.Employee)
+                    .ThenInclude(e => e.OccupationNavigation)
+                .ToListAsync();
+
+            try
+            {
+                List<SalaryRecord> salaryRecords = new List<SalaryRecord>();
+                foreach (var record in records)
+                {
+                    if (id != null && record.EmployeeId.ToString() != id) continue;
+                    DateTime start, end;
+                    if (time_start != null) start = Convert.ToDateTime(time_start);
+                    else start = DateTime.MinValue;
+                    if (time_end != null) end = Convert.ToDateTime(time_end);
+                    else end = DateTime.MaxValue;
+                    if (record.PayDatetime < start || record.PayDatetime > end) continue;
+                    if (occupation != null && record.Employee.Occupation != occupation) continue;
+
+                    SalaryRecord salaryRecord = new SalaryRecord();
+                    salaryRecord.id = record.EmployeeId.ToString();
+                    salaryRecord.name = record.Employee.Name;
+                    salaryRecord.occupation = record.Employee.Occupation;
+                    salaryRecord.time = record.PayDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                    salaryRecord.amount = record.Employee.OccupationNavigation.Amount;
+                    salaryRecords.Add(salaryRecord);
+                }
+
+                return Ok(salaryRecords);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        public class PostSalaryInfo
+        {
+            public string? occupation { get; set; }
+            public string? amount { get; set; }
+        }
+
+        // POST 增加或者更新一个工资级别
+        [HttpPost("PostOneSalaryInfo")]
+        public async Task<ActionResult> PostOneSalaryInfo(PostSalaryInfo p)
+        {
+            if (p.occupation == null || p.amount == null) return BadRequest();
+
+            try
+            {
+                Salary salary = new Salary();
+                salary.Occupation = p.occupation;
+                salary.Amount = Convert.ToDecimal(p.amount);
+                _context.Salaries.Add(salary);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        public class PostSalaryRecord
+        {
+            public string? id { get; set; }
+            public string? time { get; set; }
+        }
+
+        // POST 增加一个发钱记录
+        [HttpPost("PostOneSalaryRecord")]
+        public async Task<ActionResult> PostOneSalaryRecord(PostSalaryRecord p)
+        {
+            if (p.id == null || p.time == null) return BadRequest();
+
+            try
+            {
+                Payroll payroll = new Payroll();
+                payroll.EmployeeId = Convert.ToDecimal(p.id);
+                payroll.PayDatetime = Convert.ToDateTime(p.time);
+                _context.Payrolls.Add(payroll);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        // DELETE 删除一个工资级别
+        [HttpDelete("DeleteSalaryInfo")]
+        public async Task<ActionResult> DeleteSalaryInfo(string? occupation)
+        {
+            if (occupation == null) return BadRequest();
+            var salary = await _context.Salaries
+                .FirstOrDefaultAsync(s => s.Occupation == occupation);
+            if (salary == null) return NotFound();
+
+            try
+            {
+                _context.Salaries.Remove(salary);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }
