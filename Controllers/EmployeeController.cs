@@ -44,7 +44,7 @@ namespace youAreWhatYouEat.Controllers
             public string pay_datetime { get; set; }
             public decimal? amount { get; set; }
         }
-        public class PrizeInfo
+        public class GetPrizeInfo
         {
             public string prize_datetime { get; set; }
             public string? level { get; set; }
@@ -53,25 +53,20 @@ namespace youAreWhatYouEat.Controllers
 
         public class EmployeeMessage
         {
-            public Dictionary<string, dynamic> data { get; set; } = new Dictionary<string, dynamic>();
-            public EmployeeMessage()
-            {
-                data.Add("id", null);
-                data.Add("name", null);
-                data.Add("gender", null);
-                data.Add("occupation", null);
-                data.Add("birthday", null);
-                data.Add("avatar", null);
-                data.Add("cover", null);
-            }
+            public string? id { get; set; }
+            public string? name { get; set; }
+            public string? gender { get; set; }
+            public string? occupation { get; set; }
+            public string? birthday { get; set; }
+            public string? avatar { get; set; }
+            public string? cover { get; set; }
+            public List<AttendInfo>? attends { get; set; }
+            public List<PayrollInfo>? payrolls { get; set; }
+            public List<GetPrizeInfo>? prizes { get; set; }
         }
         public class ModifyMessage
         {
-            public Dictionary<string, dynamic> data { get; set; } = new Dictionary<string, dynamic>();
-            public ModifyMessage()
-            {
-                data.Add("success", false);
-            }
+            public bool? success { get; set; }
         }
 
         public class EmployeePostInfo
@@ -147,17 +142,14 @@ namespace youAreWhatYouEat.Controllers
                 amount = (decimal)salary.Amount;
             }
 
-            message.data["id"] = employee.Id.ToString();
-            message.data["name"] = employee.Name;
-            message.data["gender"] = employee.Gender;
-            message.data["occupation"] = employee.Occupation;
-            if (employee.Birthday != null) message.data["birthday"] = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
-            else message.data["birthday"] = null;
-           message.data["avatar"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
-            message.data["cover"] = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".jpg";
-            message.data.Add("attends", new List<AttendInfo>());
-            message.data.Add("payrolls", new List<PayrollInfo>());
-            message.data.Add("prizes", new List<PrizeInfo>());
+            message.id = employee.Id.ToString();
+            message.name = employee.Name;
+            message.gender = employee.Gender;
+            message.occupation = employee.Occupation;
+            if (employee.Birthday != null) message.birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
+            else message.birthday = null;
+           message.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
+            message.cover = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".jpg";
 
             List<AttendInfo> attends = new List<AttendInfo>();
             foreach (Attend attend in employee.Attends)
@@ -170,18 +162,18 @@ namespace youAreWhatYouEat.Controllers
                 attendObj.place = attend.Plan.Place;
                 attends.Add(attendObj);
             }
-            message.data["attends"] = attends;
+            message.attends = attends;
 
-            List<PrizeInfo> prizes = new List<PrizeInfo>();
+            List<GetPrizeInfo> prizes = new List<GetPrizeInfo>();
             foreach (Prize prize in employee.Prizes)
             {
-                PrizeInfo prizesObj = new PrizeInfo();
+                GetPrizeInfo prizesObj = new GetPrizeInfo();
                 prizesObj.prize_datetime = prize.PrizeDatetime.ToString("yyyy-MM-dd hh:mm:ss");
                 prizesObj.level = prize.Lv;
                 prizesObj.amount = prize.LvNavigation.Amount;
                 prizes.Add(prizesObj);
             }
-            message.data["prizes"] = prizes;
+            message.prizes = prizes;
 
             List<PayrollInfo> payrolls = new List<PayrollInfo>();
             foreach (Payroll payroll in employee.Payrolls)
@@ -191,7 +183,7 @@ namespace youAreWhatYouEat.Controllers
                 payrollObj.amount = amount;
                 payrolls.Add(payrollObj);
             }
-            message.data["payrolls"] = payrolls;
+            message.payrolls = payrolls;
 
             return Ok(message);
         }
@@ -315,7 +307,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 _context.Employees.Remove(employee);
                 await _context.SaveChangesAsync();
-                message.data["success"] = true;
+                message.success = true;
             }
             catch (DbUpdateException ex)
             {

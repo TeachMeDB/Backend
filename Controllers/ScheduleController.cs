@@ -43,11 +43,6 @@ namespace youAreWhatYouEat.Controllers
             public string? gender { get; set; }
         }
 
-        public class ScheduleMessage
-        {
-            public List<ScheduleInfo> data { get; set; } = new List<ScheduleInfo>();
-        }
-
         public class ScheduleInfo2
         {
             public string time_start { get; set; }
@@ -59,7 +54,7 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取指定排班信息
         [HttpGet("GetScheduleInfo")]
-        public async Task<ActionResult<ScheduleMessage>> GetScheduleInfo(string? start, string? end, string? id, string? place, string? occupation)
+        public async Task<ActionResult<List<ScheduleInfo>>> GetScheduleInfo(string? start, string? end, string? id, string? place, string? occupation)
         {
             var scheduleInfo = await _context.WorkPlans
                 .Include(w => w.Attends)
@@ -70,7 +65,6 @@ namespace youAreWhatYouEat.Controllers
             if (start != null) start_time = Convert.ToDateTime(start);
             if (end != null) end_time = Convert.ToDateTime(end);
 
-            ScheduleMessage message = new ScheduleMessage();
             List<ScheduleInfo> infos = new List<ScheduleInfo>();
             foreach (WorkPlan schedule in scheduleInfo)
             {
@@ -116,8 +110,7 @@ namespace youAreWhatYouEat.Controllers
             }
 
             if (infos.Count == 0) return NotFound();
-            message.data = infos;
-            return Ok(message);
+            return Ok(infos);
         }
 
         // GET 获取可排班人员
