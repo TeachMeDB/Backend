@@ -54,7 +54,7 @@ namespace youAreWhatYouEat.Controllers
             return Ok(ret);
         }
 
-        [HttpGet("byname")]
+        [HttpGet("ByName")]
         public async Task<ActionResult<GetDishesItem>> GetDish(string name)
         {
             if (_context.Dishes == null)
@@ -112,6 +112,54 @@ namespace youAreWhatYouEat.Controllers
             dm.DishDescription = dish.description;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("UpdateDishStatus")]
+        public async Task<ActionResult> UpdateDishStatus(string order_id, string dish_order_id, string status)
+        {
+            if (_context.Dishes == null)
+            {
+                return Problem("Entity set 'ModelContext.Dishes'  is null.");
+            }
+
+            var l = await _context.Dishorderlists.Where(e => e.OrderId == order_id && e.DishOrderId == dish_order_id).FirstAsync();
+
+            l.DishStatus = status;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("UpdateOrderStatus")]
+        public async Task<ActionResult> UpdateOrderStatus(string order_id, string status)
+        {
+            if (_context.Dishes == null)
+            {
+                return Problem("Entity set 'ModelContext.Dishes'  is null.");
+            }
+
+            var l = await _context.Orderlists.FindAsync(order_id);
+
+            l.OrderStatus = status;
 
             try
             {
@@ -189,6 +237,24 @@ namespace youAreWhatYouEat.Controllers
                     dishOrderListItem.dish.Add(ditem);
                 }
                 ret.Add(dishOrderListItem);
+            }
+            return Ok(ret);
+        }
+
+        // GET: api/Dishes/OrderListById
+        [HttpGet("OrderListById")]
+        public async Task<ActionResult<DishOrderListItem>> GetOrderListById(string order_id)
+        {
+            var ret = new DishOrderListItem();
+            var dl = _context.Dishorderlists.Include(e => e.Dish).Where(e => e.OrderId == order_id);
+            ret.order_id = order_id;
+            ret.order_status = _context.Orderlists.Where(e => e.OrderId == order_id).First().OrderStatus;
+            await foreach (var item in dl.AsAsyncEnumerable())
+            {
+                DishOrderItem ditem = new DishOrderItem();
+                ditem.status = item.DishStatus;
+                ditem.dish_name = item.Dish.DishName;
+                ret.dish.Add(ditem);
             }
             return Ok(ret);
         }
