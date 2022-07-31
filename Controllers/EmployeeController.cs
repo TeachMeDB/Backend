@@ -217,7 +217,7 @@ namespace youAreWhatYouEat.Controllers
                         if (occupation != null) employee.Occupation = occupation;
                         if (birthday != null) employee.Birthday = Convert.ToDateTime(birthday);
 
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         if (avatar != null)
                         {
                             byte[] base64 = Convert.FromBase64String(avatar);
@@ -265,7 +265,7 @@ namespace youAreWhatYouEat.Controllers
                         if (birthday != null) employee.Birthday = Convert.ToDateTime(birthday);
 
                         _context.Employees.Add(employee);
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         if (avatar != null)
                         {
                             byte[] base64 = Convert.FromBase64String(avatar);

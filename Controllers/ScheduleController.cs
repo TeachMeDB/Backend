@@ -186,7 +186,7 @@ namespace youAreWhatYouEat.Controllers
                     attend.EmployeeId = Convert.ToDecimal(p.employee_ids[i]);
                     _context.Attends.Add(attend);
                 }
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok(true);
 
             } catch (Exception ex)
