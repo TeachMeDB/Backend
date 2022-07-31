@@ -44,11 +44,56 @@ namespace youAreWhatYouEat.Controllers
             return Ok(prizeInfos);
         }
 
-        // GET 获取获奖记录
-        [HttpGet("{id}")]
-        public string Get(int id)
+        public class PrizeRecordInfo
         {
-            return "value";
+            public string? id { get; set; }
+            public string? name { get; set; }
+            public string? level { get; set; }
+            public string? time { get; set; }
+            public decimal? amount { get; set; }
+        }
+
+        // GET 获取获奖记录
+        [HttpGet("GetPrizeRecord")]
+        public async Task<ActionResult<List<PrizeRecordInfo>>> GetPrizeRecord(string?level, string? id, string? time_start, string? time_end)
+        {
+            var records = await _context.Awards
+                .Include(a => a.Prizes)
+                    .ThenInclude(p => p.Employee)
+                .ToListAsync();
+
+            try
+            {
+                List<PrizeRecordInfo> prizeRecords = new List<PrizeRecordInfo>();
+                foreach (var record in records)
+                {
+                    if (level != null && level != record.Lv) continue;
+                    foreach (var priz in record.Prizes)
+                    {
+                        if (id != null && priz.EmployeeId.ToString() != id) continue;
+                        DateTime start, end;
+                        if (time_start != null) start = Convert.ToDateTime(time_start);
+                        else start = DateTime.MinValue;
+                        if (time_end != null) end = Convert.ToDateTime(time_end);
+                        else end = DateTime.MaxValue;
+
+                        if (priz.PrizeDatetime >= start && priz.PrizeDatetime <= end)
+                        {
+                            PrizeRecordInfo prizeRecordInfo = new PrizeRecordInfo();
+                            prizeRecordInfo.id = priz.EmployeeId.ToString();
+                            prizeRecordInfo.name = priz.Employee.Name;
+                            prizeRecordInfo.time = priz.PrizeDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                            prizeRecordInfo.level = priz.Lv;
+                            prizeRecordInfo.amount = record.Amount;
+                            prizeRecords.Add(prizeRecordInfo);
+                        }
+                    }
+                }
+                return Ok(prizeRecords);
+            } catch (Exception e) 
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         public class PostAwardInfo
@@ -96,8 +141,37 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
-        // DELETE  删除一个奖金级别
-        [HttpDelete("DeleteAward/{level}")]
+        public class PostPrizeInfo
+        {
+            public string? id { get; set; }
+            public string? level { get; set; }
+            public string? time { get; set; }
+        }
+
+        // POST 增加/更新一个发奖记录
+        [HttpPost("PostPrizeRecord")]
+        public async Task<ActionResult> PostPrizeRecord(PostPrizeInfo p)
+        {
+            if (p.id == null || p.level == null || p.time == null) return BadRequest();
+
+            try
+            {
+                Prize prize = new Prize();
+                prize.Lv = p.level;
+                prize.EmployeeId = Convert.ToDecimal(p.id);
+                prize.PrizeDatetime = Convert.ToDateTime(p.time);
+
+                _context.Prizes.Add(prize);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+            // DELETE  删除一个奖金级别
+            [HttpDelete("DeleteAward/{level}")]
         public async Task<ActionResult> DeleteAward(string? level)
         {
             if (level == null) return BadRequest();
