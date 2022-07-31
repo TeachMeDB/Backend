@@ -48,6 +48,15 @@ namespace youAreWhatYouEat.Controllers
             public List<ScheduleInfo> data { get; set; } = new List<ScheduleInfo>();
         }
 
+        public class ScheduleInfo2
+        {
+            public string time_start { get; set; }
+            public string time_end { get; set; }
+            public string occupation { get; set; }
+            public string place { get; set; }
+            public List<string> employee_ids { get; set; }
+        }
+
         // GET 获取指定排班信息
         [HttpGet("GetScheduleInfo")]
         public async Task<ActionResult<ScheduleMessage>> GetScheduleInfo(string? start, string? end, string? id, string? place, string? occupation)
@@ -155,15 +164,64 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // POST 增加一条排班记录
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [HttpPost("PostScheduleInfo")]
+        public async Task<ActionResult<bool>> PostScheduleInfo(ScheduleInfo2 p)
         {
+            try
+            {
+                DateTime start = Convert.ToDateTime(p.time_start);
+                DateTime end = Convert.ToDateTime(p.time_end);
+                string occupation = p.occupation;
+                string place = p.place;
+                var id = await _context.WorkPlans
+                    .MaxAsync(b => b.Id) + 1;
+
+                WorkPlan workPlan = new WorkPlan();
+                workPlan.TimeStart = start;
+                workPlan.TimeEnd = end;
+                workPlan.Occupation = occupation;
+                workPlan.Place = place;
+                workPlan.Id = id;
+                workPlan.No = p.employee_ids.Count;
+
+                _context.WorkPlans.Add(workPlan);
+                for (int i = 0; i < p.employee_ids.Count; i++)
+                {
+                    Attend attend = new Attend();
+                    attend.Attendance = false;
+                    attend.PlanId = id;
+                    attend.EmployeeId = Convert.ToDecimal(p.employee_ids[i]);
+                    _context.Attends.Add(attend);
+                }
+                _context.SaveChanges();
+                return Ok(true);
+
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE 删除一条排班记录
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("DeleteScheduleInfo /{id}")]
+        public async Task<ActionResult<bool>> Delete(string? id)
         {
+            decimal? del_id = Convert.ToDecimal(id);
+            if (del_id == null) return BadRequest();
+
+            var work_plan = await _context.WorkPlans.FindAsync(del_id);
+            if (work_plan == null) return NotFound();
+
+            try
+            {
+                _context.WorkPlans.Remove(work_plan);
+                await _context.SaveChangesAsync();
+                return Ok(true);
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest(ex);
+            }
         }
     }
 }
