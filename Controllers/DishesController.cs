@@ -125,6 +125,54 @@ namespace youAreWhatYouEat.Controllers
             return Ok();
         }
 
+        [HttpPost("UpdateDishStatus")]
+        public async Task<ActionResult> UpdateDishStatus(string order_id, string dish_order_id, string status)
+        {
+            if (_context.Dishes == null)
+            {
+                return Problem("Entity set 'ModelContext.Dishes'  is null.");
+            }
+
+            var l = await _context.Dishorderlists.Where(e => e.OrderId == order_id && e.DishOrderId == dish_order_id).FirstAsync();
+
+            l.DishStatus = status;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("UpdateOrderStatus")]
+        public async Task<ActionResult> UpdateOrderStatus(string order_id, string status)
+        {
+            if (_context.Dishes == null)
+            {
+                return Problem("Entity set 'ModelContext.Dishes'  is null.");
+            }
+
+            var l = await _context.Orderlists.FindAsync(order_id);
+
+            l.OrderStatus = status;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
         // POST: api/Dishes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
