@@ -27,7 +27,8 @@ namespace youAreWhatYouEat.Controllers
             public decimal id { get; set; }
             public string dis_name { get; set; }
             public decimal price { get; set; }
-            public string description { get; set; }
+            public string? description { get; set; } = string.Empty;
+            public List<string>? tags { get; set; } = new List<string>();
         }
 
 
@@ -41,13 +42,17 @@ namespace youAreWhatYouEat.Controllers
             }
             List<GetDishesItem> ret = new List<GetDishesItem>();
 
-            await foreach (var item in _context.Dishes)
+            await foreach (var item in _context.Dishes.Include(e => e.Dtags).AsAsyncEnumerable())
             {
                 var dishesItem = new GetDishesItem();
                 dishesItem.id = item.DishId;
                 dishesItem.dis_name = item.DishName;
                 dishesItem.price = item.DishPrice;
                 dishesItem.description = item.DishDescription;
+                foreach (var t in item.Dtags)
+                {
+                    dishesItem.tags.Add(t.DtagName);
+                }
                 ret.Add(dishesItem);
             }
 
@@ -79,7 +84,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // GET: api/Dishes/5
-        [HttpGet("{id}")]
+        [HttpGet("GetDishById")]
         public async Task<ActionResult<Dish>> GetDish(decimal id)
         {
             if (_context.Dishes == null)
@@ -260,7 +265,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // DELETE: api/Dishes/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DelDishById")]
         public async Task<IActionResult> DeleteDish(decimal id)
         {
             if (_context.Dishes == null)

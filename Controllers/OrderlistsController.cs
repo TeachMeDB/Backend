@@ -45,6 +45,8 @@ namespace youAreWhatYouEat.Controllers
 
         public class OrderInfo
         {
+            public string? dish_order_id { get; set; }
+            public string? dish_name { get; set; }
             public string? order_id { get; set; }
             public string? creation_time { get; set; }
             public string? table_id { get; set; }
@@ -64,7 +66,7 @@ namespace youAreWhatYouEat.Controllers
             public Dictionary<string, dynamic> summary { get; set; } = new Dictionary<string, dynamic>();
             public List<dynamic> orders { get; set; } = new List<dynamic>();
 
-            public int errorCode = 0;
+            public int code = 0;
             public OrderListMessage()
             {
                 summary["order_count"] = 0;
@@ -91,56 +93,53 @@ namespace youAreWhatYouEat.Controllers
             var p = await _context.Promotions.Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
                 .Include(e => e.Hasdishes)
                 .ToListAsync();
-
-            foreach (Orderlist o in orderListInfo)
+            Dictionary<decimal, decimal> discount_dict = new Dictionary<decimal, decimal>();
+            foreach (var pi in p)
             {
-                OrderInfo om = new OrderInfo();
-                om.order_id = o.OrderId;
-                om.creation_time = o.CreationTime.ToString();
-                om.table_id = o.TableId.ToString();
-                om.order_status = o.OrderStatus;
-                decimal price = 0.0M;
-                decimal discount_price = 0.0M;
-                Dictionary<decimal, decimal> discount_dict = new Dictionary<decimal, decimal>();
-                foreach (Dishorderlist c in o.Dishorderlists)
+                var pd = pi.Hasdishes.ToList();
+                foreach(var c in pd)
                 {
-                    price += c.FinalPayment;
-                    foreach (var pi in p)
+                    if (discount_dict.ContainsKey(c.DishId))
                     {
-                        var pd = pi.Hasdishes.ToDictionary(e => e.DishId);
-                        if (pd.ContainsKey(c.DishId))
+                        if (discount_dict[c.DishId] > c.Discount * c.Dish.DishPrice)
                         {
-                            if (pd[c.DishId].Discount != null && c.Dish.DishPrice != null)
-                            {
-                                if (discount_dict.ContainsKey(c.DishId))
-                                {
-                                    if (discount_dict[c.DishId] > pd[c.DishId].Discount * c.Dish.DishPrice)
-                                    {
-                                        discount_dict[c.DishId] = (decimal)pd[c.DishId].Discount * c.Dish.DishPrice;
-                                    }
-                                }
-                            }
+                            discount_dict[c.DishId] = (decimal)c.Discount * c.Dish.DishPrice;
                         }
                     }
+                    else
+                    {
+                        discount_dict[c.DishId] = (decimal)c.Discount * c.Dish.DishPrice;
+                    }
                 }
-                foreach (var d in discount_dict)
+            }
+            foreach (Orderlist o in orderListInfo)
+            {
+                foreach (Dishorderlist c in o.Dishorderlists)
                 {
-                    discount_price += d.Value;
+                    OrderInfo om = new OrderInfo();
+                    om.dish_order_id = c.DishOrderId;
+                    om.dish_name = c.Dish.DishName;
+                    om.order_id = o.OrderId;
+                    om.creation_time = o.CreationTime.ToString();
+                    om.table_id = o.TableId.ToString();
+                    om.order_status = o.OrderStatus;
+
+                    om.final_payment = c.FinalPayment;
+                    om.discount_price = discount_dict[c.DishId];
+                    orderListMessage.orders.Add(om);
+
+                    tot_cnt++;
+                    tot_cre += (decimal)om.final_payment;
                 }
-                om.final_payment = price;
-                om.discount_price = discount_price;
-                orderListMessage.orders.Add(om);
-                tot_cnt++;
-                tot_cre += price;
             }
 
             orderListMessage.summary["order_count"] = tot_cnt;
             orderListMessage.summary["total_credit"] = tot_cre;
 
-            orderListMessage.errorCode = 200;
+            orderListMessage.code = 200;
             if (tot_cnt <= 0)
-                orderListMessage.errorCode = 404;
-            return orderListMessage;
+                orderListMessage.code = 404;
+            return Ok(orderListMessage);
         }
 
         public class VipOrderDatum

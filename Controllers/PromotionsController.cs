@@ -153,7 +153,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // DELETE: api/Promotions/5
-        [HttpDelete("{id}")]
+        [HttpDelete("DelPromotionById")]
         public async Task<IActionResult> DeletePromotion(decimal id)
         {
             if (_context.Promotions == null)
