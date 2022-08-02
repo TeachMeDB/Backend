@@ -37,7 +37,7 @@ namespace youAreWhatYouEat.Controllers
             public string? time_start { get; set; }
             public string? time_end { get; set; }
             public string? place { get; set; }
-            public bool? attendence { get; set; }
+            public bool? attendance { get; set; }
         }
         public class PayrollInfo
         {
@@ -156,7 +156,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 AttendInfo attendObj = new AttendInfo();
                 attendObj.plan_id = attend.PlanId.ToString();
-                attendObj.attendence = attend.Attendance;
+                attendObj.attendance = attend.Attendance;
                 attendObj.time_start = ((DateTime)attend.Plan.TimeStart).ToString("yyyy-MM-dd hh:mm:ss");
                 attendObj.time_end = ((DateTime)attend.Plan.TimeEnd).ToString("yyyy-MM-dd hh:mm:ss");
                 attendObj.place = attend.Plan.Place;
