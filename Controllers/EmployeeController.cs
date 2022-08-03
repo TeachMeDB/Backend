@@ -118,8 +118,30 @@ namespace youAreWhatYouEat.Controllers
             return Ok(info);
         }
 
-        // GET 获取一位员工的信息
-        [HttpGet("GetOneEmployeeInfo")]
+        public class EmployeeInfo3
+        {
+            public decimal? employee_id { get; set; }
+            public string? employee_name { get; set; }
+        }
+
+        [HttpGet("GetEmployeeInfo2")]
+        public async Task<ActionResult<List<EmployeeInfo3>>> GetEmployeeInfo2()
+        {
+            var info = await _context.Employees
+                .ToListAsync();
+            List<EmployeeInfo3> infos = new List<EmployeeInfo3>();
+            foreach (var item in info)
+            {
+                EmployeeInfo3 employeeInfo2 = new EmployeeInfo3();
+                employeeInfo2.employee_id = item.Id;
+                employeeInfo2.employee_name = item.Name;
+                infos.Add(employeeInfo2);
+            }
+            return Ok(infos);
+        }
+
+            // GET 获取一位员工的信息
+            [HttpGet("GetOneEmployeeInfo")]
         public async Task<ActionResult<EmployeeMessage>> GetOneEmployeeInfo(decimal? id)
         {
             if (id == null) return BadRequest();
