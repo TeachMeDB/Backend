@@ -57,9 +57,19 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
+        public class VIPInfo2
+        {
+            public string? user_name { get; set; }
+            public string? birthday { get; set; }
+            public string? gender { get; set; }
+            public decimal? balance { get; set; }
+            public decimal? credit { get; set; }
+            public string? status { get; set; }
+        }
+
         public class AllVIPInfo
         {
-            public List<VIPInfo>? vips = new List<VIPInfo>();
+            public List<VIPInfo2>? vips = new List<VIPInfo2>();
             public Dictionary<string, dynamic>? summary = new Dictionary<string, dynamic>();
             public Dictionary<string, dynamic>? summary2 = new Dictionary<string, dynamic>();
 
@@ -88,11 +98,14 @@ namespace youAreWhatYouEat.Controllers
             AllVIPInfo allVIPInfo = new AllVIPInfo();
             foreach(var vip in vips)
             {
-                VIPInfo v = new VIPInfo();
+                VIPInfo2 v = new VIPInfo2();
                 v.user_name = vip.UserName;
                 v.gender = vip.Gender;
                 v.balance = vip.Balance;
                 v.credit = vip.Credit;
+                v.status = "正常";
+                if (vip.Birthday != null) v.birthday = ((DateTime)vip.Birthday).ToString("yyyy-MM-dd");
+                else v.birthday = null;
                 allVIPInfo.vips.Add(v);
                 allVIPInfo.summary["series"][0].data.Add(vip.Credit);
                 allVIPInfo.summary["options"].xaxis["categories"].Add(vip.UserName);

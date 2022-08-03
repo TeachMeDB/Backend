@@ -22,7 +22,7 @@ namespace youAreWhatYouEat.Controllers
             public string? creation_time { get; set; }
             public string? table_id { get; set; }
             public string? order_status { get; set; }
-            public decimal? tot_price { get; set; }
+            public decimal? total_price { get; set; }
         }
 
         // GET 根据订单号获取订单
@@ -45,7 +45,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 payment += item.FinalPayment;
             }
-            orderInfo.tot_price = payment;
+            orderInfo.total_price = payment;
 
             return Ok(orderInfo);
         }
@@ -70,7 +70,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 payment += item.FinalPayment;
             }
-            orderInfo.tot_price = payment;
+            orderInfo.total_price = payment;
 
             return Ok(orderInfo);
         }
@@ -86,7 +86,7 @@ namespace youAreWhatYouEat.Controllers
         public class AllOrderInfo
         {
             public Dictionary<string, dynamic> summary = new Dictionary<string, dynamic>();
-            public List<OrderInfo2>? orders = new List<OrderInfo2>();
+            public List<OrderInfo>? orders = new List<OrderInfo>();
 
             public AllOrderInfo()
             {
@@ -126,18 +126,19 @@ namespace youAreWhatYouEat.Controllers
 
             foreach (var order in orders)
             {
-                OrderInfo2 orderInfo = new OrderInfo2();
+                OrderInfo orderInfo = new OrderInfo();
                 orderInfo.order_id = order.OrderId;
                 orderInfo.table_id = order.TableId.ToString();
                 orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd hh:mm:ss");
                 orderInfo.order_status = order.OrderStatus;
-                info.orders.Add(orderInfo);
 
                 decimal order_credit = 0;
                 foreach(var tem in order.Dishorderlists)
                 {
                     order_credit += tem.FinalPayment;
                 }
+                orderInfo.total_price = order_credit;
+                info.orders.Add(orderInfo);
 
                 order_count++;
                 if (order.OrderStatus == "待处理")
