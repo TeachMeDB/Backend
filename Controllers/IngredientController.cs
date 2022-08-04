@@ -30,6 +30,43 @@ namespace youAreWhatYouEat.Controllers
             public List<IngredientInfo>? data = new List<IngredientInfo>();
         }
 
+        // GET 获取原料
+        [HttpGet("GetIngredient")]
+        public async Task<ActionResult<IngredientMessgae>> GetIngredient(string? ingrName)
+        {
+            IngredientMessgae msg = new IngredientMessgae();
+            if (ingrName != null)
+            {
+                var ingrs = await _context.Ingredients
+                    .FirstOrDefaultAsync(i => i.IngrName == ingrName);
+                if (ingrs == null) return NotFound();
+
+                msg.total = 1;
+                IngredientInfo info = new IngredientInfo();
+                info.ingrId = Convert.ToInt32(ingrs.IngrId);
+                info.ingrName = ingrs.IngrName;
+                info.ingrDescription = ingrs.IngrDescription;
+                info.ingrType = ingrs.IngrType;
+                msg.data.Add(info);
+            } else
+            {
+                var ingrs = await _context.Ingredients
+                    .ToListAsync();
+                
+                foreach(var ingr in ingrs)
+                {
+                    IngredientInfo info = new IngredientInfo();
+                    info.ingrId = Convert.ToInt32(ingr.IngrId);
+                    info.ingrName = ingr.IngrName;
+                    info.ingrDescription = ingr.IngrDescription;
+                    info.ingrType = ingr.IngrType;
+                    msg.data.Add(info);
+                }
+                msg.total = msg.data.Count;
+            }
+            return Ok(msg);
+        }
+
         public class IngredientRecordInfo
         {
             public int? record_id { get; set; }
@@ -50,54 +87,197 @@ namespace youAreWhatYouEat.Controllers
             public int? total { get; set; }
         }
 
-        // GET 获取原料
-        [HttpGet("GetIngredient")]
-        public async Task<ActionResult<IngredientMessgae>> GetIngredient(string? ingrName)
-        {
-            return null;
-        }
-
         // GET 获取原料采购记录
         [HttpGet("GetIngredientRecord")]
-        public string GetIngredientRecord()
+        public async Task<ActionResult<IngredientRecordMessgae>> GetIngredientRecord()
         {
-            return "value";
+            var records = await _context.IngredientRecords
+                .Include(i => i.Ingr)
+                .Include(i => i.Director)
+                .ToListAsync();
+            IngredientRecordMessgae msg = new IngredientRecordMessgae();
+
+            foreach (var record in records)
+            {
+                IngredientRecordInfo info = new IngredientRecordInfo();
+                info.record_id = Convert.ToInt32(record.RecordId);
+                info.ingr_id = Convert.ToInt32(record.IngrId);
+                info.purchasing_date = ((DateTime)record.PurchasingDate).ToString("yyyy-MM-dd");
+                info.measure_unit = record.MeasureUnit;
+                info.director_id = Convert.ToInt32(record.DirectorId);
+                info.shelf_life = Convert.ToInt32(record.ShelfLife);
+                info.produced_date = ((DateTime)record.ProducedDate).ToString("yyyy-MM-dd");
+                info.price = record.Price;
+                info.ingr_name = record.Ingr.IngrName;
+                info.director_name = record.Director.Name;
+                msg.data.Add(info);
+            }
+            msg.total = msg.data.Count;
+            return Ok(msg);
+        }
+
+        public class PostIngredientInfo
+        {
+            public int? ingr_id { get; set; }
+            public string? ingr_name { get; set; }
+            public string? ingr_type { get; set; }
+            public string? ingr_description { get; set; }
         }
 
         // POST 添加原料
         [HttpPost("PostAddIngredient")]
-        public void PostAddIngredient([FromBody] string value)
+        public async Task<ActionResult> PostAddIngredient(PostIngredientInfo p)
         {
+            if (p.ingr_id == null || p.ingr_type == null || p.ingr_name == null || p.ingr_description == null)
+                return BadRequest();
+            Ingredient info = new Ingredient();
+            info.IngrId = Convert.ToDecimal(p.ingr_id);
+            info.IngrName = p.ingr_name;
+            info.IngrDescription = p.ingr_description;
+            info.IngrType = p.ingr_type;
+
+            try
+            {
+                _context.Ingredients.Add(info);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // POST 修改原料
         [HttpPost("PostUpdateIngredient")]
-        public void PostUpdateIngredient([FromBody] string value)
+        public async Task<ActionResult> PostUpdateIngredient(PostIngredientInfo p)
         {
+            if (p.ingr_id == null || p.ingr_type == null || p.ingr_name == null || p.ingr_description == null)
+                return BadRequest();
+            var info = await _context.Ingredients
+                .FirstOrDefaultAsync(i => i.IngrId == Convert.ToDecimal(p.ingr_id));
+            if (info == null) return NotFound();
+
+            try
+            {
+                info.IngrType = p.ingr_type;
+                info.IngrName = p.ingr_name;
+                info.IngrDescription = p.ingr_description;
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        public class PostIngredientRecordInfo
+        {
+            public int? record_id { get; set; }
+            public int? ingr_id { get; set; }
+            public string? purchasing_date { get; set; }
+            public string? measure_unit { get; set; }
+            public int? shelf_life { get; set; }
+            public string? produced_date { get; set; }
+            public decimal? price { get; set; }
+            public int? director_id { get; set; }
         }
 
         // POST 添加原料采购记录
         [HttpPost("PostAddIngredientRecord")]
-        public void PostAddIngredientRecord([FromBody] string value)
+        public async Task<ActionResult> PostAddIngredientRecord(PostIngredientRecordInfo p)
         {
+            if (p.ingr_id == null || p.record_id == null)
+                return BadRequest();
+            IngredientRecord info = new IngredientRecord();
+            info.IngrId = Convert.ToDecimal(p.ingr_id);
+            info.RecordId = Convert.ToDecimal(p.record_id);
+            info.PurchasingDate = Convert.ToDateTime(p.purchasing_date);
+            info.ProducedDate = Convert.ToDateTime(p.produced_date);
+            info.MeasureUnit = p.measure_unit;
+            info.ShelfLife = p.shelf_life;
+            info.Price = p.price;
+            info.DirectorId = Convert.ToDecimal(p.director_id);
+
+            try
+            {
+                _context.IngredientRecords.Add(info);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // POST 修改原料采购记录
         [HttpPost("PostUpdateIngredientRecord")]
-        public void PostUpdateIngredientRecord([FromBody] string value)
+        public async Task<ActionResult> PostUpdateIngredientRecord(PostIngredientRecordInfo p)
         {
+            if (p.ingr_id == null || p.record_id == null)
+                return BadRequest();
+            var info = await _context.IngredientRecords
+                .FirstOrDefaultAsync(i => i.RecordId == Convert.ToDecimal(p.record_id));
+            if (info == null) return NotFound();
+
+            try
+            {
+                info.IngrId = Convert.ToDecimal(p.ingr_id);
+                info.PurchasingDate = Convert.ToDateTime(p.purchasing_date);
+                info.ProducedDate = Convert.ToDateTime(p.produced_date);
+                info.MeasureUnit = p.measure_unit;
+                info.ShelfLife = p.shelf_life;
+                info.Price = p.price;
+                info.DirectorId = Convert.ToDecimal(p.director_id);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         // DELETE 删除原料
         [HttpDelete("DeleteIngredient")]
-        public void DeleteIngredient(int id)
+        public async Task<ActionResult> DeleteIngredient(string id)
         {
+            if (id == null) return BadRequest();
+            var info = await _context.Ingredients
+                .FirstOrDefaultAsync(i => i.IngrId.ToString() == id);
+            if (info == null) return NotFound();
+
+            try
+            {
+                _context.Ingredients.Remove(info);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE 删除原料采购记录
         [HttpDelete("DeleteIngredientRecord")]
-        public void DeleteIngredientRecord(int id)
+        public async Task<ActionResult> DeleteIngredientRecord(string id)
         {
+            if (id == null) return BadRequest();
+            var info = await _context.IngredientRecords
+                .FirstOrDefaultAsync(i => i.RecordId.ToString() == id);
+            if (info == null) return NotFound();
+
+            try
+            {
+                _context.IngredientRecords.Remove(info);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
         }
     }
 }
