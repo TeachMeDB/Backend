@@ -45,8 +45,6 @@ namespace youAreWhatYouEat.Controllers
 
         public class OrderInfo
         {
-            public string? dish_order_id { get; set; }
-            public string? dish_name { get; set; }
             public string? order_id { get; set; }
             public string? creation_time { get; set; }
             public string? table_id { get; set; }
@@ -97,7 +95,7 @@ namespace youAreWhatYouEat.Controllers
             foreach (var pi in p)
             {
                 var pd = pi.Hasdishes.ToList();
-                foreach(var c in pd)
+                foreach (var c in pd)
                 {
                     if (discount_dict.ContainsKey(c.DishId))
                     {
@@ -114,23 +112,22 @@ namespace youAreWhatYouEat.Controllers
             }
             foreach (Orderlist o in orderListInfo)
             {
+                OrderInfo om = new OrderInfo();
+                om.order_id = o.OrderId;
+                om.creation_time = o.CreationTime.ToString();
+                om.table_id = o.TableId.ToString();
+                om.order_status = o.OrderStatus;
+                om.final_payment = 0.0M;
+                om.discount_price = 0.0M;
                 foreach (Dishorderlist c in o.Dishorderlists)
                 {
-                    OrderInfo om = new OrderInfo();
-                    om.dish_order_id = c.DishOrderId;
-                    om.dish_name = c.Dish.DishName;
-                    om.order_id = o.OrderId;
-                    om.creation_time = o.CreationTime.ToString();
-                    om.table_id = o.TableId.ToString();
-                    om.order_status = o.OrderStatus;
+                    om.final_payment += c.FinalPayment;
+                    om.discount_price += discount_dict[c.DishId];
 
-                    om.final_payment = c.FinalPayment;
-                    om.discount_price = discount_dict[c.DishId];
-                    orderListMessage.orders.Add(om);
-
-                    tot_cnt++;
-                    tot_cre += (decimal)om.final_payment;
                 }
+                tot_cnt++;
+                tot_cre += (decimal)om.final_payment;
+                orderListMessage.orders.Add(om);
             }
 
             orderListMessage.summary["order_count"] = tot_cnt;
@@ -226,6 +223,7 @@ namespace youAreWhatYouEat.Controllers
         public class DishOrderInfo
         {
             public string? dish_order_id { get; set; }
+            public string? dish_name { get; set; }
             public string? order_id { get; set; }
             public DateTime? order_creation_time { get; set; }
             public decimal? dish_id { get; set; }
@@ -253,6 +251,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 DishOrderInfo t = new DishOrderInfo();
                 t.dish_order_id = dol.DishOrderId;
+                t.dish_name = dol.Dish.DishName;
                 t.order_id = dol.OrderId;
                 t.order_creation_time = dol.Order.CreationTime;
                 t.dish_id = dol.DishId;

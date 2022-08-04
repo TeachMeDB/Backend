@@ -25,10 +25,18 @@ namespace youAreWhatYouEat.Controllers
         public class GetDishesItem
         {
             public decimal id { get; set; }
-            public string dis_name { get; set; }
+            public string? dis_name { get; set; }
             public decimal price { get; set; }
             public string? description { get; set; } = string.Empty;
             public List<string>? tags { get; set; } = new List<string>();
+        }
+
+        public class PostDishesItem
+        {
+            public decimal id { get; set; }
+            public string? dis_name { get; set; }
+            public decimal price { get; set; }
+            public string? description { get; set; } = string.Empty;
         }
 
 
@@ -105,7 +113,7 @@ namespace youAreWhatYouEat.Controllers
         // POST: api/Dishes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("UpdateDish")]
-        public async Task<ActionResult> PostDish(GetDishesItem dish)
+        public async Task<ActionResult> PostDish(PostDishesItem dish)
         {
             if (_context.Dishes == null)
             {
