@@ -24,7 +24,7 @@ namespace youAreWhatYouEat.Controllers
             public string? ingrDescription { get; set; }
         }
 
-        public class IngredientMessgae
+        public class IngredientMessage
         {
             public int? total { get; set; }
             public List<IngredientInfo>? data = new List<IngredientInfo>();
@@ -32,9 +32,9 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取原料
         [HttpGet("GetIngredient")]
-        public async Task<ActionResult<IngredientMessgae>> GetIngredient(string? ingrName)
+        public async Task<ActionResult<IngredientMessage>> GetIngredient(string? ingrName)
         {
-            IngredientMessgae msg = new IngredientMessgae();
+            IngredientMessage msg = new IngredientMessage();
             if (ingrName != null)
             {
                 var ingrs = await _context.Ingredients
@@ -81,7 +81,7 @@ namespace youAreWhatYouEat.Controllers
             public string? director_name { get; set; }
         }
 
-        public class IngredientRecordMessgae
+        public class IngredientRecordMessage
         {
             public List<IngredientRecordInfo>? data = new List<IngredientRecordInfo>();
             public int? total { get; set; }
@@ -89,13 +89,13 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取原料采购记录
         [HttpGet("GetIngredientRecord")]
-        public async Task<ActionResult<IngredientRecordMessgae>> GetIngredientRecord()
+        public async Task<ActionResult<IngredientRecordMessage>> GetIngredientRecord()
         {
             var records = await _context.IngredientRecords
                 .Include(i => i.Ingr)
                 .Include(i => i.Director)
                 .ToListAsync();
-            IngredientRecordMessgae msg = new IngredientRecordMessgae();
+            IngredientRecordMessage msg = new IngredientRecordMessage();
 
             foreach (var record in records)
             {
