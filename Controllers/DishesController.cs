@@ -47,6 +47,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dis_name { get; set; }
             public decimal price { get; set; }
             public string? description { get; set; } = string.Empty;
+            public List<string>? tags { get; set; } = new List<string>();
         }
 
 
@@ -87,12 +88,16 @@ namespace youAreWhatYouEat.Controllers
 
             try
             {
-                var item = await _context.Dishes.Where(e => e.DishName == name).FirstAsync();
+                var item = await _context.Dishes.Include(e => e.Dtags).Where(e => e.DishName == name).FirstAsync();
                 GetDishesItem ret = new GetDishesItem();
                 ret.id = item.DishId;
                 ret.dis_name = item.DishName;
                 ret.price = item.DishPrice;
                 ret.description = item.DishDescription;
+                foreach (var t in item.Dtags)
+                {
+                    ret.tags.Add(t.DtagName);
+                }
                 return ret;
             }
             catch (Exception ex)
@@ -135,7 +140,17 @@ namespace youAreWhatYouEat.Controllers
             dm.DishDescription = dish.description;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
-
+            foreach (var tag in dish.tags)
+            {
+                try
+                {
+                    dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -148,17 +163,61 @@ namespace youAreWhatYouEat.Controllers
             return Ok();
         }
 
+        [HttpPost("AddDish")]
+        public async Task<ActionResult> AddDish(PostDishesItem dish)
+        {
+            if (_context.Dishes == null)
+            {
+                return Problem("Entity set 'ModelContext.Dishes'  is null.");
+            }
+
+            var dm = await _context.Dishes.FindAsync(dish.id);
+            if (dm != null)
+            {
+                return NoContent();
+            }
+            dm.DishDescription = dish.description;
+            dm.DishName = dish.dis_name;
+            dm.DishPrice = dish.price;
+            foreach (var tag in dish.tags)
+            {
+                try
+                {
+                    dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NoContent();
+            }
+
+            return Ok();
+        }
+
+        public class PostUpdateDishStatusMsg
+        {
+            public string? order_id { get; set; }
+            public decimal? dish_id { get; set; }
+            public string? dish_status { get; set; }
+        }
         [HttpPost("UpdateDishStatus")]
-        public async Task<ActionResult> UpdateDishStatus(string order_id, string dish_order_id, string status)
+        public async Task<ActionResult> UpdateDishStatus(PostUpdateDishStatusMsg p)
         {
             if (_context.Dishes == null)
             {
                 return Problem("Entity set 'ModelContext.Dishes'  is null.");
             }
+            var l = await _context.Dishorderlists.Where(e => e.OrderId == p.order_id && e.DishId == p.dish_id).FirstAsync();
 
-            var l = await _context.Dishorderlists.Where(e => e.OrderId == order_id && e.DishOrderId == dish_order_id).FirstAsync();
-
-            l.DishStatus = status;
+            l.DishStatus = p.dish_status;
 
             try
             {
@@ -172,17 +231,22 @@ namespace youAreWhatYouEat.Controllers
             return Ok();
         }
 
+        public class PostUpdateOrderStatusMsg
+        {
+            public string? order_id { get; set; }
+            public string? order_status { get; set; }
+        }
         [HttpPost("UpdateOrderStatus")]
-        public async Task<ActionResult> UpdateOrderStatus(string order_id, string status)
+        public async Task<ActionResult> UpdateOrderStatus(PostUpdateOrderStatusMsg p)
         {
             if (_context.Dishes == null)
             {
                 return Problem("Entity set 'ModelContext.Dishes'  is null.");
             }
 
-            var l = await _context.Orderlists.FindAsync(order_id);
+            var l = await _context.Orderlists.FindAsync(p.order_id);
 
-            l.OrderStatus = status;
+            l.OrderStatus = p.order_status;
 
             try
             {
@@ -229,6 +293,7 @@ namespace youAreWhatYouEat.Controllers
         {
             public string? dish_name { get; set; } = string.Empty;
             public string? status { get; set; } = null;
+            public string? dish_order_id { get; set; } = String.Empty;
         }
 
         public class DishOrderListItem
@@ -257,6 +322,7 @@ namespace youAreWhatYouEat.Controllers
                     DishOrderItem ditem = new DishOrderItem();
                     ditem.status = item.DishStatus;
                     ditem.dish_name = item.Dish.DishName;
+                    ditem.dish_order_id = item.DishOrderId;
                     dishOrderListItem.dish.Add(ditem);
                 }
                 ret.Add(dishOrderListItem);

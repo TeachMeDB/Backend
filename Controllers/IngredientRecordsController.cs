@@ -98,21 +98,26 @@ namespace youAreWhatYouEat.Controllers
             return ret;
         }
 
+        public class UpdateIngredientRecordMsg
+        {
+            public string? record_id { get; set; }
+            public decimal? surplus { get; set; }
+        }
         // POST: api/IngredientRecords/UpdateIngredientRecord
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("UpdateIngredientRecord")]
-        public async Task<ActionResult> UpdateIngredientRecord(decimal record_id, decimal surplus)
+        public async Task<ActionResult> UpdateIngredientRecord(UpdateIngredientRecordMsg p)
         {
             if (_context.IngredientRecords == null)
             {
                 return Problem("Entity set 'ModelContext.IngredientRecords'  is null.");
             }
-            var i = await _context.IngredientRecords.FindAsync(record_id);
-            if (surplus >= 0.0M)
+            var i = await _context.IngredientRecords.FindAsync(p.record_id);
+            if (p.surplus >= 0.0M)
             {
-                if (i.Surplus >= surplus)
+                if (i.Surplus >= p.surplus)
                 {
-                    i.Surplus = surplus;
+                    i.Surplus = p.surplus;
                 }
             }
             else
