@@ -31,7 +31,7 @@ namespace youAreWhatYouEat.Controllers
                 .Include(s => s.Employees)
                 .ToListAsync();
 
-            if (salaries == null) return NotFound();
+            if (salaries == null) return NoContent();
 
             List<SalaryInfo> salaryInfos = new List<SalaryInfo>();
             foreach(var salary in salaries)
@@ -154,7 +154,7 @@ namespace youAreWhatYouEat.Controllers
             if (occupation == null) return BadRequest();
             var salary = await _context.Salaries
                 .FirstOrDefaultAsync(s => s.Occupation == occupation);
-            if (salary == null) return NotFound();
+            if (salary == null) return NoContent();
 
             try
             {

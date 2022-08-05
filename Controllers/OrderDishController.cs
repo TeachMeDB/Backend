@@ -40,7 +40,7 @@ namespace youAreWhatYouEat.Controllers
                 .Include(o => o.Dishorderlists)
                     .ThenInclude(d => d.Dish)
                 .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (orderdish == null) return NotFound();
+            if (orderdish == null) return NoContent();
 
             OrderDishInfo2 orderDishInfo = new OrderDishInfo2();
             List<DishInfo> infos = new List<DishInfo>();
@@ -91,14 +91,14 @@ namespace youAreWhatYouEat.Controllers
         [HttpGet("GetCategoryDishes")]
         public async Task<ActionResult<CategoryDishInfo>> GetCategoryDishes(string? dish_tag, int? promotion_id)
         {
-            if (dish_tag == null) return NotFound();
+            if (dish_tag == null) return NoContent();
             var tag = await _context.Dishtags
                 .Include(d => d.Dishes)
                     .ThenInclude(dish => dish.CommentOnDishes)
                 .Include(d => d.Dishes)
                     .ThenInclude(dish => dish.Hasdishes)
                 .FirstOrDefaultAsync(d => d.DtagName == dish_tag);
-            if (tag == null) return NotFound();
+            if (tag == null) return NoContent();
 
             CategoryDishInfo info = new CategoryDishInfo();
             List<DishInfo2> list = new List<DishInfo2>();
@@ -152,7 +152,7 @@ namespace youAreWhatYouEat.Controllers
             var order = await _context.Orderlists
                 .Include(o => o.Dishorderlists)
                 .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             PriceInfo info = new PriceInfo();
             decimal price = 0;
@@ -177,7 +177,7 @@ namespace youAreWhatYouEat.Controllers
             if (order_id == null) return BadRequest();
             var order = await _context.Orderlists
                 .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             StatusInfo info = new StatusInfo();
             info.order_status = order.OrderStatus;
@@ -220,7 +220,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Promotions == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             List<PromotionRecord> ret = new List<PromotionRecord>();
@@ -346,7 +346,7 @@ namespace youAreWhatYouEat.Controllers
             if (p.table_id == null) return BadRequest();
             var table = await _context.Dinningtables
                 .FirstOrDefaultAsync(t => t.TableId == p.table_id);
-            if (table == null) return NotFound();
+            if (table == null) return NoContent();
 
             table.Occupied = "否";
             try

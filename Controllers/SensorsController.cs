@@ -72,7 +72,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Sensors == null)
             {
-                return NotFound();
+                return NoContent();
             }
             SensorsGetRawDataMessage ret = new SensorsGetRawDataMessage();
             try
@@ -107,7 +107,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Sensors == null)
             {
-                return NotFound();
+                return NoContent();
             }
             SensorsGetUsedResourcesMessage ret = new SensorsGetUsedResourcesMessage();
             ret.begin = UnixTimeUtil.UnixTimeToDateTime(begin);
@@ -153,7 +153,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Sensors == null)
             {
-                return NotFound();
+                return NoContent();
             }
             return await _context.Sensors.ToListAsync();
         }
@@ -164,13 +164,13 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Sensors == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var sensor = await _context.Sensors.FindAsync(id);
 
             if (sensor == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return sensor;
@@ -196,7 +196,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 if (!SensorExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -242,12 +242,12 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Sensors == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var sensor = await _context.Sensors.FindAsync(id);
             if (sensor == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Sensors.Remove(sensor);

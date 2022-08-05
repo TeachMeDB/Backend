@@ -41,6 +41,7 @@ namespace youAreWhatYouEat.Controllers
             public string id { get; set; }
             public string? name { get; set; }
             public string? gender { get; set; }
+            public string? avatar { get; set; }
         }
 
         public class ScheduleInfo2
@@ -109,7 +110,7 @@ namespace youAreWhatYouEat.Controllers
                 }
             }
 
-            if (infos.Count == 0) return NotFound();
+            if (infos.Count == 0) return NoContent();
             return Ok(infos);
         }
 
@@ -148,11 +149,12 @@ namespace youAreWhatYouEat.Controllers
                     emp.id = employee.Id.ToString();
                     emp.name = employee.Name;
                     emp.gender = employee.Gender;
+                    emp.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".png";
                     info.Add(emp);
                 }
             }
 
-            if (info.Count == 0) return NotFound();
+            if (info.Count == 0) return NoContent();
             return Ok(info);
         }
 
@@ -203,7 +205,7 @@ namespace youAreWhatYouEat.Controllers
             if (del_id == null) return BadRequest();
 
             var work_plan = await _context.WorkPlans.FindAsync(del_id);
-            if (work_plan == null) return NotFound();
+            if (work_plan == null) return NoContent();
 
             try
             {

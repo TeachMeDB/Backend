@@ -26,12 +26,12 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.IngredientRecords == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var ingredientRecord = await _context.IngredientRecords.FindAsync(record_id);
             if (ingredientRecord == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.IngredientRecords.Remove(ingredientRecord);
@@ -55,7 +55,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.IngredientRecords == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var ret = new List<IngredientRecordReplyItem>();
 
@@ -79,7 +79,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.IngredientRecords == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var ret = new List<IngredientRecordReplyItem>();
 
@@ -125,7 +125,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (DbUpdateException)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok();
@@ -153,7 +153,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (DbUpdateException)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok();

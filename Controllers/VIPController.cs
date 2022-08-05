@@ -30,7 +30,7 @@ namespace youAreWhatYouEat.Controllers
         {
             var vip = await _context.Vips
                 .FirstOrDefaultAsync(v => v.UserName == user_name);
-            if (vip == null) return NotFound();
+            if (vip == null) return NoContent();
 
             VIPInfo info = new VIPInfo();
             info.user_name = vip.UserName;
@@ -132,7 +132,7 @@ namespace youAreWhatYouEat.Controllers
             if (p.user_name == null) return BadRequest();
             var vip = await _context.Vips
                 .FirstOrDefaultAsync(v => v.UserName == p.user_name);
-            if (vip == null) return NotFound();
+            if (vip == null) return NoContent();
 
             try
             {

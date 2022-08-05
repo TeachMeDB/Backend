@@ -20,6 +20,16 @@ namespace youAreWhatYouEat.Controllers
             _context = new ModelContext();
         }
 
+        // GET: api/Dishes/GetDishNameById
+        [HttpGet("GetDishNameById")]
+        public async Task<ActionResult<string>> GetDishNameById(string? dish_id)
+        {
+            if (dish_id == null) return BadRequest();
+            var dish = await _context.Dishes
+                .FirstOrDefaultAsync(d => d.DishId.ToString() == dish_id);
+            if (dish == null) return NoContent();
+            return Ok(dish.DishName);
+        }
 
 
         public class GetDishesItem
@@ -46,7 +56,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Dishes == null)
             {
-                return NotFound();
+                return NoContent();
             }
             List<GetDishesItem> ret = new List<GetDishesItem>();
 
@@ -72,7 +82,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Dishes == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             try
@@ -87,7 +97,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound();
+                return NoContent();
             }
         }
 
@@ -97,13 +107,13 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Dishes == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var dish = await _context.Dishes.FindAsync(id);
 
             if (dish == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return dish;
@@ -132,7 +142,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok();
@@ -156,7 +166,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok();
@@ -180,7 +190,7 @@ namespace youAreWhatYouEat.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return Ok();
@@ -278,12 +288,12 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Dishes == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var dish = await _context.Dishes.FindAsync(id);
             if (dish == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Dishes.Remove(dish);

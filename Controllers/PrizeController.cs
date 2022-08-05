@@ -177,7 +177,7 @@ namespace youAreWhatYouEat.Controllers
             if (level == null) return BadRequest();
             var del_award = _context.Awards
                 .FirstOrDefault(x => x.Lv == level);
-            if (del_award == null) return NotFound();
+            if (del_award == null) return NoContent();
 
             try
             {

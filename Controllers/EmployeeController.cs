@@ -5,6 +5,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using youAreWhatYouEat.Authorization;
 
 namespace youAreWhatYouEat.Controllers
 {
@@ -71,6 +72,7 @@ namespace youAreWhatYouEat.Controllers
 
         public class EmployeePostInfo
         {
+            public string? token { get; set; }
             public string? id { get; set; }
             public string? name { get; set; }
             public string? gender { get; set; }
@@ -82,8 +84,11 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取所有员工的信息
         [HttpGet("GetAllEmployeeInfo")]
-        public async Task<ActionResult<List<EmployeeInfo>>> GetAllEmployeeInfo()
+        public async Task<ActionResult<List<EmployeeInfo>>> GetAllEmployeeInfo(string? token)
         {
+            var check = MyToken.checkToken(token);
+            if (!check.Result.active) return Forbid();
+
             var employeeInfo = await _context.Employees
                 .Include(e => e.Attends)
                 .Include(e => e.Prizes)
@@ -99,7 +104,7 @@ namespace youAreWhatYouEat.Controllers
                 tem.Occupation = employee.Occupation;
                 if (employee.Birthday != null) tem.Birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
                 else tem.Birthday = null;
-                tem.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + tem.Id.ToString() + ".jpg";
+                tem.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + tem.Id.ToString() + ".png";
 
                 decimal tot = 0, participant = 0;
                 foreach (Attend item in employee.Attends)
@@ -125,8 +130,11 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetEmployeeInfo2")]
-        public async Task<ActionResult<List<EmployeeInfo3>>> GetEmployeeInfo2()
+        public async Task<ActionResult<List<EmployeeInfo3>>> GetEmployeeInfo2(string? token)
         {
+            var check = MyToken.checkToken(token);
+            if (!check.Result.active) return Forbid();
+
             var info = await _context.Employees
                 .ToListAsync();
             List<EmployeeInfo3> infos = new List<EmployeeInfo3>();
@@ -142,8 +150,11 @@ namespace youAreWhatYouEat.Controllers
 
             // GET 获取一位员工的信息
             [HttpGet("GetOneEmployeeInfo")]
-        public async Task<ActionResult<EmployeeMessage>> GetOneEmployeeInfo(decimal? id)
+        public async Task<ActionResult<EmployeeMessage>> GetOneEmployeeInfo(string? token, decimal? id)
         {
+            var check = MyToken.checkToken(token);
+            if (!check.Result.active) return Forbid();
+
             if (id == null) return BadRequest();
             EmployeeMessage message = new EmployeeMessage();
 
@@ -154,7 +165,7 @@ namespace youAreWhatYouEat.Controllers
                 .Include(e => e.Prizes)
                     .ThenInclude(p => p.LvNavigation)
                 .SingleOrDefaultAsync(x => x.Id == id);
-            if (employee == null) return NotFound();
+            if (employee == null) return NoContent();
 
             decimal amount = 0;
             if (employee.Occupation != null)
@@ -170,8 +181,8 @@ namespace youAreWhatYouEat.Controllers
             message.occupation = employee.Occupation;
             if (employee.Birthday != null) message.birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
             else message.birthday = null;
-           message.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".jpg";
-            message.cover = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".jpg";
+           message.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + employee.Id.ToString() + ".png";
+            message.cover = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + employee.Id.ToString() + ".png";
 
             List<AttendInfo> attends = new List<AttendInfo>();
             foreach (Attend attend in employee.Attends)
@@ -214,6 +225,9 @@ namespace youAreWhatYouEat.Controllers
         [HttpPost("PostEmployeeInfo")]
         public async Task<ActionResult<bool>> PostEmployeeInfo(EmployeePostInfo p)
         {
+            var check = MyToken.checkToken(p.token);
+            if (!check.Result.active) return Forbid();
+
             try
             {
                 string? id = p.id;
@@ -232,7 +246,7 @@ namespace youAreWhatYouEat.Controllers
                             .FirstOrDefaultAsync(x => x.Id.ToString() == id);
                         if (employee == null)
                         {
-                            return NotFound();
+                            return NoContent();
                         }
                         if (name != null) employee.Name = name;
                         if (gender != null) employee.Gender = gender;
@@ -243,13 +257,13 @@ namespace youAreWhatYouEat.Controllers
                         if (avatar != null)
                         {
                             byte[] base64 = Convert.FromBase64String(avatar);
-                            string path = "/images/employees/employee_" + id + ".jpg";
+                            string path = "/images/employees/employee_" + id + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         if (cover != null)
                         {
                             byte[] base64 = Convert.FromBase64String(cover);
-                            string path = "/images/covers/cover_" + id + ".jpg";
+                            string path = "/images/covers/cover_" + id + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         return Ok(true);
@@ -291,13 +305,13 @@ namespace youAreWhatYouEat.Controllers
                         if (avatar != null)
                         {
                             byte[] base64 = Convert.FromBase64String(avatar);
-                            string path = "/images/employees/employee_" + id + ".jpg";
+                            string path = "/images/employees/employee_" + id + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         if (cover != null)
                         {
                             byte[] base64 = Convert.FromBase64String(cover);
-                            string path = "/images/covers/cover_" + id + ".jpg";
+                            string path = "/images/covers/cover_" + id + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         return Created("", true);
@@ -316,14 +330,17 @@ namespace youAreWhatYouEat.Controllers
 
         // DELETE 删除一条员工信息
         [HttpDelete("DeleteEmployeeInfo")]
-        public async Task<ActionResult<ModifyMessage>> DeleteEmployeeInfo(int? id)
+        public async Task<ActionResult<ModifyMessage>> DeleteEmployeeInfo(string? token, int? id)
         {
+            var check = MyToken.checkToken(token);
+            if (!check.Result.active) return Forbid();
+
             ModifyMessage message = new ModifyMessage();
             decimal? del_id = Convert.ToDecimal(id);
             if (del_id == null) return BadRequest();
 
             var employee = await _context.Employees.FindAsync(del_id);
-            if (employee == null) return NotFound();
+            if (employee == null) return NoContent();
 
             try
             {

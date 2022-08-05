@@ -39,7 +39,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 var ingrs = await _context.Ingredients
                     .FirstOrDefaultAsync(i => i.IngrName == ingrName);
-                if (ingrs == null) return NotFound();
+                if (ingrs == null) return NoContent();
 
                 msg.total = 1;
                 IngredientInfo info = new IngredientInfo();
@@ -155,7 +155,7 @@ namespace youAreWhatYouEat.Controllers
                 return BadRequest();
             var info = await _context.Ingredients
                 .FirstOrDefaultAsync(i => i.IngrId == Convert.ToDecimal(p.ingr_id));
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {
@@ -219,7 +219,7 @@ namespace youAreWhatYouEat.Controllers
                 return BadRequest();
             var info = await _context.IngredientRecords
                 .FirstOrDefaultAsync(i => i.RecordId == Convert.ToDecimal(p.record_id));
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {
@@ -246,7 +246,7 @@ namespace youAreWhatYouEat.Controllers
             if (id == null) return BadRequest();
             var info = await _context.Ingredients
                 .FirstOrDefaultAsync(i => i.IngrId.ToString() == id);
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {
@@ -266,7 +266,7 @@ namespace youAreWhatYouEat.Controllers
             if (id == null) return BadRequest();
             var info = await _context.IngredientRecords
                 .FirstOrDefaultAsync(i => i.RecordId.ToString() == id);
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {

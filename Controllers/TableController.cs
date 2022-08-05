@@ -30,7 +30,7 @@ namespace youAreWhatYouEat.Controllers
         {
             var table = await _context.Dinningtables.
                 FirstOrDefaultAsync(d => d.TableId.ToString() == table_id);
-            if (table == null) return NotFound();
+            if (table == null) return NoContent();
 
             TableInfo tableInfo = new TableInfo();
             tableInfo.table_id = table.TableId;
@@ -193,7 +193,7 @@ namespace youAreWhatYouEat.Controllers
         {
             var table = await _context.Dinningtables
                 .FirstOrDefaultAsync(t => t.TableId.ToString() == table_id);
-            if (table == null) return NotFound();
+            if (table == null) return NoContent();
             table.Occupied = "是";
 
             try
@@ -216,10 +216,10 @@ namespace youAreWhatYouEat.Controllers
 
             var table = await _context.Dinningtables
                 .FirstOrDefaultAsync(t => t.TableId == p.table_id);
-            if (table == null) return NotFound();
+            if (table == null) return NoContent();
 
-            table.TableCapacity = Convert.ToInt32(table.TableCapacity);
-            table.CustomerNumber = Convert.ToInt32(table.CustomerNumber);
+            table.TableCapacity = Convert.ToInt32(p.table_capacity);
+            table.CustomerNumber = Convert.ToInt32(p.customer_number);
             table.Occupied = p.occupied;
 
             try

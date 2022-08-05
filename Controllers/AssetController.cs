@@ -41,7 +41,7 @@ namespace youAreWhatYouEat.Controllers
                 var assets = await _context.Assets
                     .Include(a => a.Employee)
                     .FirstOrDefaultAsync(a =>a.AssetsType == assets_type);
-                if (assets == null) return NotFound();
+                if (assets == null) return NoContent();
 
                 msg.total = 1;
                 AssetInfo info = new AssetInfo();
@@ -184,7 +184,7 @@ namespace youAreWhatYouEat.Controllers
                 return BadRequest();
             var info = await _context.Assets
                 .FirstOrDefaultAsync(i => i.AssetsId == p.assetsId);
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {
@@ -250,7 +250,7 @@ namespace youAreWhatYouEat.Controllers
                 .FirstOrDefaultAsync(m => (m.AssetsId == p.assets_id && m.ManageCost == p.manage_cost && 
                 m.ManageDate == Convert.ToDateTime(p.manage_date) && m.ManageType == p.manage_type && 
                 m.ManageReason == p.manage_reason));
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
             info.EmployeeId = Convert.ToDecimal(p.employee_id);
 
             try
@@ -271,7 +271,7 @@ namespace youAreWhatYouEat.Controllers
             if (id == null) return BadRequest();
             var info = await _context.Assets
                 .FirstOrDefaultAsync(a => a.AssetsId == id);
-            if (info == null) return NotFound();
+            if (info == null) return NoContent();
 
             try
             {

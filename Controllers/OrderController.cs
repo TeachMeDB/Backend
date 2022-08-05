@@ -32,7 +32,7 @@ namespace youAreWhatYouEat.Controllers
             var order = await _context.Orderlists
                 .Include(o => o.Dishorderlists)
                 .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.order_id = order.OrderId;
@@ -57,7 +57,7 @@ namespace youAreWhatYouEat.Controllers
             var order = await _context.Orderlists
                 .Include(o => o.Dishorderlists)
                 .FirstOrDefaultAsync(o => o.TableId == table);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.order_id = order.OrderId;
@@ -190,7 +190,7 @@ namespace youAreWhatYouEat.Controllers
 
             var order = await _context.Orderlists
                 .FirstOrDefaultAsync(o => o.OrderId == p.order_id);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             try
             {
@@ -234,7 +234,7 @@ namespace youAreWhatYouEat.Controllers
                 .Include(o => o.Dishorderlists)
                     .ThenInclude(d => d.Dish)
                 .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NotFound();
+            if (order == null) return NoContent();
 
             OrderDishInfo info = new OrderDishInfo();
             foreach(var item in order.Dishorderlists)

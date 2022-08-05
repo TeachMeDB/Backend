@@ -74,7 +74,7 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Promotions == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             List<PromotionRecord> ret = new List<PromotionRecord>();
@@ -120,7 +120,7 @@ namespace youAreWhatYouEat.Controllers
                 var promotion = await _context.Promotions.FindAsync(p.promotion_id);
                 if (promotion == null)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 _context.Promotions.Remove(promotion);
                 try
@@ -158,12 +158,12 @@ namespace youAreWhatYouEat.Controllers
         {
             if (_context.Promotions == null)
             {
-                return NotFound();
+                return NoContent();
             }
             var promotion = await _context.Promotions.FindAsync(id);
             if (promotion == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Promotions.Remove(promotion);
