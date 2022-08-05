@@ -82,7 +82,7 @@ namespace youAreWhatYouEat.Controllers
                             PrizeRecordInfo prizeRecordInfo = new PrizeRecordInfo();
                             prizeRecordInfo.id = priz.EmployeeId.ToString();
                             prizeRecordInfo.name = priz.Employee.Name;
-                            prizeRecordInfo.time = priz.PrizeDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                            prizeRecordInfo.time = priz.PrizeDatetime.ToString("yyyy-MM-dd HH:mm:ss");
                             prizeRecordInfo.level = priz.Lv;
                             prizeRecordInfo.amount = record.Amount;
                             prizeRecords.Add(prizeRecordInfo);

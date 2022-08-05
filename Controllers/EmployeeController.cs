@@ -190,8 +190,8 @@ namespace youAreWhatYouEat.Controllers
                 AttendInfo attendObj = new AttendInfo();
                 attendObj.plan_id = attend.PlanId.ToString();
                 attendObj.attendance = attend.Attendance;
-                attendObj.time_start = ((DateTime)attend.Plan.TimeStart).ToString("yyyy-MM-dd hh:mm:ss");
-                attendObj.time_end = ((DateTime)attend.Plan.TimeEnd).ToString("yyyy-MM-dd hh:mm:ss");
+                attendObj.time_start = ((DateTime)attend.Plan.TimeStart).ToString("yyyy-MM-dd HH:mm:ss");
+                attendObj.time_end = ((DateTime)attend.Plan.TimeEnd).ToString("yyyy-MM-dd HH:mm:ss");
                 attendObj.place = attend.Plan.Place;
                 attends.Add(attendObj);
             }
@@ -201,7 +201,7 @@ namespace youAreWhatYouEat.Controllers
             foreach (Prize prize in employee.Prizes)
             {
                 GetPrizeInfo prizesObj = new GetPrizeInfo();
-                prizesObj.prize_datetime = prize.PrizeDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                prizesObj.prize_datetime = prize.PrizeDatetime.ToString("yyyy-MM-dd HH:mm:ss");
                 prizesObj.level = prize.Lv;
                 prizesObj.amount = prize.LvNavigation.Amount;
                 prizes.Add(prizesObj);
@@ -212,7 +212,7 @@ namespace youAreWhatYouEat.Controllers
             foreach (Payroll payroll in employee.Payrolls)
             {
                 PayrollInfo payrollObj = new PayrollInfo();
-                payrollObj.pay_datetime = payroll.PayDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                payrollObj.pay_datetime = payroll.PayDatetime.ToString("yyyy-MM-dd HH:mm:ss");
                 payrollObj.amount = amount;
                 payrolls.Add(payrollObj);
             }

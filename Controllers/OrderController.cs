@@ -36,7 +36,7 @@ namespace youAreWhatYouEat.Controllers
 
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.order_id = order.OrderId;
-            orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd hh:mm:ss");
+            orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd HH:mm:ss");
             orderInfo.table_id = order.TableId.ToString();
             orderInfo.order_status = order.OrderStatus;
 
@@ -61,7 +61,7 @@ namespace youAreWhatYouEat.Controllers
 
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.order_id = order.OrderId;
-            orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd hh:mm:ss");
+            orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd HH:mm:ss");
             orderInfo.table_id = order.TableId.ToString();
             orderInfo.order_status = order.OrderStatus;
 
@@ -129,7 +129,7 @@ namespace youAreWhatYouEat.Controllers
                 OrderInfo orderInfo = new OrderInfo();
                 orderInfo.order_id = order.OrderId;
                 orderInfo.table_id = order.TableId.ToString();
-                orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd hh:mm:ss");
+                orderInfo.creation_time = order.CreationTime.ToString("yyyy-MM-dd HH:mm:ss");
                 orderInfo.order_status = order.OrderStatus;
 
                 decimal order_credit = 0;

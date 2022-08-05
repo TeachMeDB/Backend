@@ -90,8 +90,8 @@ namespace youAreWhatYouEat.Controllers
 
                     ScheduleInfo info = new ScheduleInfo();
                     info.plan_id = schedule.Id.ToString();
-                    info.time_start = ((DateTime)schedule.TimeStart).ToString("yyyy-MM-dd hh:mm:ss");
-                    info.time_end = ((DateTime)schedule.TimeEnd).ToString("yyyy-MM-dd hh:mm:ss");
+                    info.time_start = ((DateTime)schedule.TimeStart).ToString("yyyy-MM-dd HH:mm:ss");
+                    info.time_end = ((DateTime)schedule.TimeEnd).ToString("yyyy-MM-dd HH:mm:ss");
                     info.place = schedule.Place;
                     info.occupation = schedule.Occupation;
 

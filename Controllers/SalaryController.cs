@@ -82,7 +82,7 @@ namespace youAreWhatYouEat.Controllers
                     salaryRecord.id = record.EmployeeId.ToString();
                     salaryRecord.name = record.Employee.Name;
                     salaryRecord.occupation = record.Employee.Occupation;
-                    salaryRecord.time = record.PayDatetime.ToString("yyyy-MM-dd hh:mm:ss");
+                    salaryRecord.time = record.PayDatetime.ToString("yyyy-MM-dd HH:mm:ss");
                     salaryRecord.amount = record.Employee.OccupationNavigation.Amount;
                     salaryRecords.Add(salaryRecord);
                 }
