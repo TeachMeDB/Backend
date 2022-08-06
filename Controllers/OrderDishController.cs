@@ -31,43 +31,50 @@ namespace youAreWhatYouEat.Controllers
             public List<DishInfo> dish_info = new List<DishInfo>();
         }
 
+        public class ListOrderId
+        {
+            public List<string>? order_id = new List<string>();
+        }
+
         // GET 获取订单的菜品信息
-        [HttpGet("GetOrderDishInfo")]
-        public async Task<ActionResult<OrderDishInfo2>> GetOrderDishInfo(string? order_id)
+        [HttpPost("GetOrderDishInfo")]
+        public async Task<ActionResult<OrderDishInfo2>> GetOrderDishInfo(ListOrderId? order_id)
         {
             if (order_id == null) return BadRequest();
-            var orderdish = await _context.Orderlists
-                .Include(o => o.Dishorderlists)
-                    .ThenInclude(d => d.Dish)
-                .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (orderdish == null) return NoContent();
-
             OrderDishInfo2 orderDishInfo = new OrderDishInfo2();
-            List<DishInfo> infos = new List<DishInfo>();
-            foreach (var dish in orderdish.Dishorderlists)
-            {
-                bool tag = false;
-                for (int i = 0; i < infos.Count; i++)
-                {
-                    if (infos[i].dish_name == dish.Dish.DishName && infos[i].dish_status == dish.DishStatus)
-                    {
-                        infos[i].dish_num++;
-                        tag = true;
-                        break;
-                    }
-                }
-                if (tag) continue;
 
-                DishInfo dishInfo = new DishInfo();
-                dishInfo.dish_name = dish.Dish.DishName;
-                dishInfo.dish_price = dish.FinalPayment;
-                dishInfo.dish_status = dish.DishStatus;
-                dishInfo.dish_num = 1;
-                dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
-                dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
-                infos.Add(dishInfo);
+            foreach (var id in order_id.order_id)
+            {
+                var orderdish = await _context.Orderlists
+                    .Include(o => o.Dishorderlists)
+                        .ThenInclude(d => d.Dish)
+                    .FirstOrDefaultAsync(o => o.OrderId == id);
+                if (orderdish == null) return NoContent();
+
+                foreach (var dish in orderdish.Dishorderlists)
+                {
+                    bool tag = false;
+                    for (int i = 0; i < orderDishInfo.dish_info.Count; i++)
+                    {
+                        if (orderDishInfo.dish_info[i].dish_name == dish.Dish.DishName && orderDishInfo.dish_info[i].dish_status == dish.DishStatus)
+                        {
+                            orderDishInfo.dish_info[i].dish_num++;
+                            tag = true;
+                            break;
+                        }
+                    }
+                    if (tag) continue;
+
+                    DishInfo dishInfo = new DishInfo();
+                    dishInfo.dish_name = dish.Dish.DishName;
+                    dishInfo.dish_price = dish.FinalPayment;
+                    dishInfo.dish_status = dish.DishStatus;
+                    dishInfo.dish_num = 1;
+                    dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
+                    dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
+                    orderDishInfo.dish_info.Add(dishInfo);
+                }
             }
-            orderDishInfo.dish_info = infos;
             return Ok(orderDishInfo);
         }
 
