@@ -122,7 +122,8 @@ namespace youAreWhatYouEat.Controllers
                 foreach (Dishorderlist c in o.Dishorderlists)
                 {
                     om.final_payment += c.FinalPayment;
-                    om.discount_price += discount_dict[c.DishId];
+                    if (discount_dict.ContainsKey(c.DishId))
+                        om.discount_price += discount_dict[c.DishId];
 
                 }
                 tot_cnt++;
