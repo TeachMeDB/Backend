@@ -243,15 +243,15 @@ namespace youAreWhatYouEat.Controllers
             return Ok(ret);
         }
 
+        public class OrderInfo3
+        {
+            public int? dish_id { get; set; }
+            public int? dish_num { get; set; }
+        }
+
         public class PostOrderInfo
         {
-            public Dictionary<string, dynamic> dishes_info = new Dictionary<string, dynamic>();
-
-            public PostOrderInfo()
-            {
-                dishes_info.Add("dish_id", 0);
-                dishes_info.Add("dish_num", 0);
-            }
+            public List<OrderInfo3> dishes_info { get; set; }
         }
 
         public class ReturnOrder
@@ -263,7 +263,6 @@ namespace youAreWhatYouEat.Controllers
         [HttpPost("PostOrder")]
         public async Task<ActionResult<ReturnOrder>> PostOrder(PostOrderInfo p)
         {
-            if (p.dishes_info["dish_id"] == null || p.dishes_info["dish_num"] == null) return BadRequest();
             var orders = await _context.Orderlists
                 .Select(o => o.OrderId)
                 .ToListAsync();
@@ -296,38 +295,42 @@ namespace youAreWhatYouEat.Controllers
                 return BadRequest(ex);
             }
 
-            for (int k = 0; k < p.dishes_info["dish_num"]; k++) {
-                Dishorderlist dish_order = new Dishorderlist();
-                dish_order.OrderId = order_id;
-                dish_order.DishId = p.dishes_info["dish_id"];
-                dish_order.DishStatus = "待处理";
-
-                string dish_order_id = "";
-                var dish_orders = new List<string>();
-                do
+            for (int t = 0; t < p.dishes_info.Count; t++) {
+                for (int k = 0; k < p.dishes_info[t].dish_num; k++)
                 {
-                    dish_orders = await _context.Dishorderlists
-                        .Select(d => d.DishOrderId)
-                        .ToListAsync();
+                    Dishorderlist dish_order = new Dishorderlist();
+                    dish_order.OrderId = order_id;
+                    dish_order.DishId = Convert.ToDecimal(p.dishes_info[t].dish_id);
+                    dish_order.DishStatus = "待处理";
 
-                    dish_order_id = "";
-                    for (int i = 0; i < 11; i++)
+                    string dish_order_id = "";
+                    var dish_orders = new List<string>();
+                    do
                     {
-                        int r = random.Next(0, 62);
-                        if (r < 10) dish_order_id += r.ToString();
-                        else if (r < 36) dish_order_id += (char)(97 + r - 10);
-                        else dish_order_id += (char)(65 + r - 36);
-                    }
-                } while (dish_orders.IndexOf(dish_order_id) != -1);
-                dish_order.DishOrderId = dish_order_id;
+                        dish_orders = await _context.Dishorderlists
+                            .Select(d => d.DishOrderId)
+                            .ToListAsync();
 
-                try
-                {
-                    _context.Dishorderlists.Add(dish_order);
-                    await _context.SaveChangesAsync();
-                } catch (Exception ex)
-                {
-                    return BadRequest(ex);
+                        dish_order_id = "";
+                        for (int i = 0; i < 11; i++)
+                        {
+                            int r = random.Next(0, 62);
+                            if (r < 10) dish_order_id += r.ToString();
+                            else if (r < 36) dish_order_id += (char)(97 + r - 10);
+                            else dish_order_id += (char)(65 + r - 36);
+                        }
+                    } while (dish_orders.IndexOf(dish_order_id) != -1);
+                    dish_order.DishOrderId = dish_order_id;
+
+                    try
+                    {
+                        _context.Dishorderlists.Add(dish_order);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex);
+                    }
                 }
             }
 
