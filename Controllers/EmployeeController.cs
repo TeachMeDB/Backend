@@ -155,8 +155,11 @@ namespace youAreWhatYouEat.Controllers
             var check = MyToken.checkToken(token);
             if (!check.Result.active) return Forbid();
 
-            if (id == null) return BadRequest();
             EmployeeMessage message = new EmployeeMessage();
+            if (id == null)
+            {
+                id = Convert.ToDecimal(check.Result.username);
+            }
 
             var employee = await _context.Employees
                 .Include(e => e.Attends)

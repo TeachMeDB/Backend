@@ -243,6 +243,69 @@ namespace youAreWhatYouEat.Controllers
             return Ok(ret);
         }
 
+        public class DishMessage
+        {
+            public List<DishesInfo> dish_all = new List<DishesInfo>();
+        }
+
+        public class DishesInfo
+        {
+            public int? dish_id { get; set; }
+            public string? dish_name { get; set; }
+            public string? dish_picture { get; set; }
+            public decimal? dish_price { get; set; }
+            public decimal? dish_rate { get; set; }
+            public string? dish_description { get; set; }
+            public List<decimal>? dish_discount = new List<decimal>();
+            public List<string>? dish_tag = new List<string>();
+        }
+
+        // Get 获取所有菜品
+        [HttpGet("GetAllDishes")]
+        public async Task<ActionResult<DishMessage>> GetAllDishes()
+        {
+            var dishes = await _context.Dishes
+                .Include(d => d.CommentOnDishes)
+                .Include(d => d.Hasdishes)
+                .Include(d => d.Dtags)
+                .ToListAsync();
+
+            DishMessage msg = new DishMessage();
+            foreach (var d in dishes)
+            {
+                DishesInfo info = new DishesInfo();
+                info.dish_id = Convert.ToInt32(d.DishId);
+                info.dish_name = d.DishName;
+                info.dish_price = d.DishPrice;
+                info.dish_description = d.DishDescription;
+                info.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + d.DishId.ToString() + ".png";
+
+                decimal rate = 0;
+                decimal count = 0;
+                foreach (var cmt in d.CommentOnDishes)
+                {
+                    if (cmt.Stars == null) continue;
+                    rate += Convert.ToInt32(cmt.Stars);
+                    count++;
+                }
+                if (count == 0) rate = 0;
+                else rate = rate / count;
+                info.dish_rate = rate;
+
+                foreach(var tag in d.Dtags)
+                {
+                    info.dish_tag.Add(tag.DtagName);
+                }
+                foreach(var dis in d.Hasdishes)
+                {
+                    info.dish_discount.Add(Convert.ToDecimal(dis.Discount));
+                }
+                msg.dish_all.Add(info);
+            }
+
+            return Ok(msg);
+        }
+
         public class OrderInfo3
         {
             public int? dish_id { get; set; }
