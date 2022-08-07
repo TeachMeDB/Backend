@@ -146,9 +146,12 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 安排座位
         [HttpGet("GetSeat")]
-        public async Task<ActionResult<SeatInfo>> GetSeat()
+        public async Task<ActionResult<SeatInfo>> GetSeat(int customer_number)
         {
             var tables = await _context.Dinningtables
+                .Where(d => d.TableCapacity >= customer_number)
+                .Where(d =>d.Occupied == "否")
+                .OrderBy(d =>d.TableCapacity)
                 .ToListAsync();
 
             SeatInfo info = new SeatInfo();

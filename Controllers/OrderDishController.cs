@@ -255,6 +255,13 @@ namespace youAreWhatYouEat.Controllers
             public List<DishesInfo> dish_all = new List<DishesInfo>();
         }
 
+        public class DishesCommentInfo
+        {
+            public string? comment_content { get; set; }
+            public string? comment_time { get; set; }
+            public decimal? comment_star { get; set; }
+        }
+
         public class DishesInfo
         {
             public int? dish_id { get; set; }
@@ -265,6 +272,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dish_description { get; set; }
             public List<decimal>? dish_discount = new List<decimal>();
             public List<string>? dish_tag = new List<string>();
+            public List<DishesCommentInfo> dish_comment = new List<DishesCommentInfo>();
         }
 
         // Get 获取所有菜品
@@ -291,6 +299,12 @@ namespace youAreWhatYouEat.Controllers
                 decimal count = 0;
                 foreach (var cmt in d.CommentOnDishes)
                 {
+                    DishesCommentInfo info2 = new DishesCommentInfo();
+                    info2.comment_star = cmt.Stars;
+                    info2.comment_time = ((DateTime)cmt.CommentTime).ToString("yyyy-MM-dd HH:mm:ss");
+                    info2.comment_content = cmt.CommentContent;
+                    info.dish_comment.Add(info2);
+
                     if (cmt.Stars == null) continue;
                     rate += Convert.ToInt32(cmt.Stars);
                     count++;
@@ -437,18 +451,18 @@ namespace youAreWhatYouEat.Controllers
             public decimal? rate { get; set; }
             public string? content { get; set; }
             public int? dish_id { get; set; }
-            public string? user_name { get; set; }
+            public string? username { get; set; }
         }
 
         // POST 提交菜品评价
         [HttpPost("PostDishComment")]
         public async Task<ActionResult> PostDishComment(DishCommentInfo p)
         {
-            if (p.dish_id == null || p.user_name == null) return BadRequest();
+            if (p.dish_id == null || p.username == null) return BadRequest();
             CommentOnDish cmt = new CommentOnDish();
             cmt.Stars = p.rate;
             cmt.DishId = Convert.ToDecimal(p.dish_id);
-            cmt.UserName = p.user_name;
+            cmt.UserName = p.username;
             cmt.CommentContent = p.content;
             cmt.CommentTime = DateTime.Now;
 
@@ -487,17 +501,17 @@ namespace youAreWhatYouEat.Controllers
         {
             public decimal? rate { get; set; }
             public string? content { get; set; }
-            public string? user_name { get; set; }
+            public string? username { get; set; }
         }
 
         // POST 提交服务评价
         [HttpPost("PostServiceComment")]
         public async Task<ActionResult> PostServiceComment(ServiceCommentInfo p)
         {
-            if (p.user_name == null) return BadRequest();
+            if (p.username == null) return BadRequest();
             CommentOnService cms = new CommentOnService();
             cms.Stars = p.rate;
-            cms.UserName = p.user_name;
+            cms.UserName = p.username;
             cms.CommentContent = p.content;
             cms.CommentTime = DateTime.Now;
 
