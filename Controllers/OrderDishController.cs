@@ -327,6 +327,34 @@ namespace youAreWhatYouEat.Controllers
             return Ok(msg);
         }
 
+        public class RealPrice
+        {
+            public decimal? price { get; set; }
+            public decimal? discount { get; set; }
+        }
+
+        [HttpGet("GetRealPrice")]
+        public async Task<ActionResult<RealPrice>> GetRealPrice(int promotion_id, int dish_id)
+        {
+            var pro = await _context.Promotions
+                .Include(p => p.Hasdishes)
+                    .ThenInclude(h => h.Dish)
+                .FirstOrDefaultAsync(p => p.PromotionId == promotion_id);
+            if (pro == null) return NoContent();
+
+            foreach(var dish in pro.Hasdishes)
+            {
+                if (dish.DishId == dish_id)
+                {
+                    RealPrice p = new RealPrice();
+                    p.price = dish.Dish.DishPrice;
+                    p.discount = dish.Discount;
+                    return Ok(p);
+                }
+            }
+            return NoContent();
+        }
+
         public class OrderInfo3
         {
             public int? dish_id { get; set; }
