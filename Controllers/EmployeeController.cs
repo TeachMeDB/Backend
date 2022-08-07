@@ -224,7 +224,7 @@ namespace youAreWhatYouEat.Controllers
             return Ok(message);
         }
 
-        // POST 删除或修改员工信息
+        // POST 新增或修改员工信息
         [HttpPost("PostEmployeeInfo")]
         public async Task<ActionResult<bool>> PostEmployeeInfo(EmployeePostInfo p)
         {

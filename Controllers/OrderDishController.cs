@@ -24,6 +24,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dish_picture { get; set; }
             public int? dish_num { get; set; }
             public int? table_id { get; set; }
+            public int? dish_id { get; set; }
         }
 
         public class OrderDishInfo2
@@ -72,6 +73,7 @@ namespace youAreWhatYouEat.Controllers
                     dishInfo.dish_num = 1;
                     dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
                     dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
+                    dishInfo.dish_id = Convert.ToInt32(dish.DishId);
                     orderDishInfo.dish_info.Add(dishInfo);
                 }
             }
@@ -192,14 +194,14 @@ namespace youAreWhatYouEat.Controllers
             return Ok(info);
         }
 
-        public class PromotionDish
+        public class PromotionDish2
         {
             public decimal dish_id { get; set; }
             public string? dish_name { get; set; }
             public decimal dish_price { get; set; }
             public string? dish_description { get; set; }
 
-            public PromotionDish(Dish d)
+            public PromotionDish2(Dish d)
             {
                 dish_id = d.DishId;
                 dish_name = d.DishName;
@@ -208,41 +210,43 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
-        public class PromotionDishRecord
+        public class PromotionDishRecord2
         {
-            public PromotionDish? dish { get; set; } = null!;
+            public PromotionDish2? dish { get; set; } = null!;
             public decimal discount { get; set; } = 1.0M;
         }
 
-        public class PromotionRecord
+        public class PromotionRecord2
         {
             public decimal promotion_id { get; set; }
             public string? description { get; set; } = null!;
-            public List<PromotionDishRecord> dishes { get; set; } = new List<PromotionDishRecord>();
+            public string? picture { get; set; }
+            public List<PromotionDishRecord2> dishes { get; set; } = new List<PromotionDishRecord2>();
         }
 
         // Get 获取正在进行的促销活动
         [HttpGet("GetPromotion")]
-        public async Task<ActionResult<PriceInfo>> GetPromotion()
+        public async Task<ActionResult<List<PromotionRecord2>>> GetPromotion()
         {
             if (_context.Promotions == null)
             {
                 return NoContent();
             }
 
-            List<PromotionRecord> ret = new List<PromotionRecord>();
+            List<PromotionRecord2> ret = new List<PromotionRecord2>();
             await foreach (var p in _context.Promotions.Include(e => e.Hasdishes).ThenInclude(e => e.Dish).AsAsyncEnumerable())
             {
                 if (p.StartTime > DateTime.Now || p.EndTime < DateTime.Now) continue;
-                PromotionRecord pr = new PromotionRecord();
+                PromotionRecord2 pr = new PromotionRecord2();
                 pr.promotion_id = p.PromotionId;
                 pr.description = p.Description;
+                pr.picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "promotions/promotion_" + p.PromotionId.ToString() + ".png";
                 var d = p.Hasdishes;
                 foreach (var di in d)
                 {
-                    PromotionDishRecord dt = new PromotionDishRecord();
+                    PromotionDishRecord2 dt = new PromotionDishRecord2();
                     if (di.Discount != null) dt.discount = (decimal)di.Discount; else dt.discount = 0.0M;
-                    dt.dish = new PromotionDish(di.Dish);
+                    dt.dish = new PromotionDish2(di.Dish);
                     pr.dishes.Add(dt);
                 }
                 ret.Add(pr);

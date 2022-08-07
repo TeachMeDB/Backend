@@ -64,6 +64,7 @@ namespace youAreWhatYouEat.Controllers
             public DateTime? start { get; set; }
             public DateTime? end { get; set; }
             public string? description { get; set; } = null!;
+            public string? cover { get; set; }
             public List<PromotionPostDishRecord> dishes { get; set; } = new List<PromotionPostDishRecord>();
         }
 
@@ -144,6 +145,12 @@ namespace youAreWhatYouEat.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                if (p.cover != null)
+                {
+                    byte[] base64 = Convert.FromBase64String(p.cover);
+                    string path = "/images/promotions/promotion_" + p.promotion_id.ToString() + ".png";
+                    System.IO.File.WriteAllBytes(path, base64);
+                }
             }
             catch (DbUpdateException)
             {
