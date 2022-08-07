@@ -176,6 +176,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 return NoContent();
             }
+            dm = new Dish();
             dm.DishDescription = dish.description;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
@@ -192,6 +193,7 @@ namespace youAreWhatYouEat.Controllers
             }
             try
             {
+                _context.Dishes.Add(dm);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)

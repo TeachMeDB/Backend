@@ -61,7 +61,7 @@ namespace youAreWhatYouEat.Controllers
         public class PromotionPostRecord
         {
             public decimal? promotion_id { get; set; }
-            public DateTime? begin { get; set; }
+            public DateTime? start { get; set; }
             public DateTime? end { get; set; }
             public string? description { get; set; } = null!;
             public List<PromotionPostDishRecord> dishes { get; set; } = new List<PromotionPostDishRecord>();
@@ -110,7 +110,7 @@ namespace youAreWhatYouEat.Controllers
 
             var ret = new Promotion();
             ret.PromotionId = 1 + await _context.Promotions.CountAsync();
-            ret.StartTime = p.begin;
+            ret.StartTime = p.start;
             ret.EndTime = p.end;
             ret.Description = p.description;
 
@@ -132,14 +132,15 @@ namespace youAreWhatYouEat.Controllers
                     throw;
                 }
             }
+            _context.Promotions.Add(ret);
             foreach (var di in p.dishes)
             {
                 Hasdish nd = new Hasdish();
-                nd.Dish = _context.Dishes.Where(e => e.DishName == di.name).First();
+                nd.DishId = _context.Dishes.Where(e => e.DishName == di.name).First().DishId;
                 nd.Discount = di.discount;
+                nd.PromotionId = ret.PromotionId;
                 ret.Hasdishes.Add(nd);
             }
-            _context.Promotions.Add(ret);
             try
             {
                 await _context.SaveChangesAsync();
