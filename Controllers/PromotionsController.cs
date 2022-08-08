@@ -110,7 +110,22 @@ namespace youAreWhatYouEat.Controllers
             }
 
             var ret = new Promotion();
-            ret.PromotionId = 1 + await _context.Promotions.CountAsync();
+            var pros = _context.Promotions
+                .OrderBy(pr => pr.PromotionId)
+                .Select(pr => pr.PromotionId);
+            decimal id = 1;
+            bool tag = false;
+            foreach (var item in pros)
+            {
+                if (item != id)
+                {
+                    tag = true;
+                    break;
+                }
+                id++;
+            }
+
+            ret.PromotionId = id;
             ret.StartTime = p.start;
             ret.EndTime = p.end;
             ret.Description = p.description;
