@@ -190,12 +190,19 @@ namespace youAreWhatYouEat.Controllers
 
         // GET: api/Orderlists/GetVipOrdersByTime
         [HttpGet("GetVipOrdersByTime")]
-        public async Task<ActionResult<VipOrderMessage>> GetVipOrderlist(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<VipOrderMessage>> GetVipOrderlist(string? begin, string? end)
         {
             VipOrderMessage ret = new VipOrderMessage();
             ret.code = 200;
             ret.data = new List<VipOrderDatum>();
             ret.summary = new VipOrderMessageSummary();
+
+            DateTime start_time, end_time;
+            if (begin == null) start_time = DateTime.MinValue;
+            else start_time = Convert.ToDateTime(begin);
+            if (end == null) end_time = DateTime.MaxValue;
+            else end_time = Convert.ToDateTime(end);
+
             var vips = _context.Vips;
             await foreach (var vip in vips)
             {
@@ -209,7 +216,11 @@ namespace youAreWhatYouEat.Controllers
                     var odrs = _context.OrderNumbers
                         .Where(e => e.UserName == vip.UserName)
                         .Include(e => e.Order)
-                        .ThenInclude(e => e.Dishorderlists);
+                        .ThenInclude(e => e.Dishorderlists)
+                        .Where(e => e.Order.CreationTime >= start_time && e.Order.CreationTime <= end_time);
+
+                    if (odrs.Count() == 0) continue;
+
                     foreach (var odr in odrs)
                     {
                         VipOrder t = new VipOrder(odr, _context);
