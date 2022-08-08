@@ -148,7 +148,7 @@ namespace youAreWhatYouEat.Controllers
                 if (p.cover != null)
                 {
                     byte[] base64 = Convert.FromBase64String(p.cover);
-                    string path = "/images/promotions/promotion_" + p.promotion_id.ToString() + ".png";
+                    string path = "/images/promotions/promotion_" + ret.PromotionId.ToString() + ".png";
                     System.IO.File.WriteAllBytes(path, base64);
                 }
             }
