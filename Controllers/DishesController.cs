@@ -136,16 +136,31 @@ namespace youAreWhatYouEat.Controllers
                 return Problem("Entity set 'ModelContext.Dishes'  is null.");
             }
 
-            var dm = await _context.Dishes.FindAsync(dish.id);
+            var dm = await _context.Dishes
+                .Include(d => d.Dtags)
+                .FirstOrDefaultAsync(d => d.DishId == dish.id);
 
             dm.DishDescription = dish.description;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
+            dm.Dtags.Clear();
+
             foreach (var tag in dish.tags)
             {
                 try
                 {
-                    dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
+                    bool dtag = false;
+                    foreach (var item in dm.Dtags)
+                    {
+                        if (tag == item.DtagName)
+                        {
+                            dtag = true;
+                            break;
+                        }
+                    }
+
+                    if(!dtag)
+                        dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
                 }
                 catch (Exception ex)
                 {
