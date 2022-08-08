@@ -48,6 +48,7 @@ namespace youAreWhatYouEat.Controllers
             public decimal price { get; set; }
             public string? description { get; set; } = string.Empty;
             public List<string>? tags { get; set; } = new List<string>();
+            public string? picture { get; set; }
         }
 
 
@@ -180,6 +181,7 @@ namespace youAreWhatYouEat.Controllers
             dm.DishDescription = dish.description;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
+            dm.DishId = dish.id;
             foreach (var tag in dish.tags)
             {
                 try
@@ -195,6 +197,13 @@ namespace youAreWhatYouEat.Controllers
             {
                 _context.Dishes.Add(dm);
                 await _context.SaveChangesAsync();
+
+                if (dish.picture != null)
+                {
+                    byte[] base64 = Convert.FromBase64String(dish.picture);
+                    string path = "/images/dishes/dish_" + dish.id.ToString() + ".png";
+                    System.IO.File.WriteAllBytes(path, base64);
+                }
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -206,8 +215,7 @@ namespace youAreWhatYouEat.Controllers
 
         public class PostUpdateDishStatusMsg
         {
-            public string? order_id { get; set; }
-            public decimal? dish_id { get; set; }
+            public string? dish_order_id { get; set; }
             public string? dish_status { get; set; }
         }
         [HttpPost("UpdateDishStatus")]
@@ -217,7 +225,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 return Problem("Entity set 'ModelContext.Dishes'  is null.");
             }
-            var l = await _context.Dishorderlists.Where(e => e.OrderId == p.order_id && e.DishId == p.dish_id).FirstAsync();
+            var l = await _context.Dishorderlists.Where(e => e.DishOrderId == p.dish_order_id).FirstOrDefaultAsync();
 
             l.DishStatus = p.dish_status;
 

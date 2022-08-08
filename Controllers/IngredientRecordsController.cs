@@ -44,9 +44,9 @@ namespace youAreWhatYouEat.Controllers
         {
             public decimal record_id { get; set; } = decimal.MaxValue;
             public string? ing_name { get; set; } = null;
-            public DateTime date { get; set; } = DateTime.UtcNow;
-            public decimal amount { get; set; } = decimal.Zero;
-            public decimal surplus { get; set; } = decimal.Zero;
+            public DateTime? date { get; set; } = DateTime.UtcNow;
+            public decimal? amount { get; set; } = decimal.Zero;
+            public decimal? surplus { get; set; } = decimal.Zero;
         }
 
         // GET: api/IngredientRecords
@@ -64,10 +64,20 @@ namespace youAreWhatYouEat.Controllers
                 var i = new IngredientRecordReplyItem();
                 i.record_id = ingredientRecord.RecordId;
                 i.ing_name = ingredientRecord.Ingr.IngrName;
-                i.surplus = (decimal)ingredientRecord.Surplus;
-                i.amount = (decimal)ingredientRecord.Purchases;
-                i.date = (DateTime)ingredientRecord.ProducedDate;
-                i.date.AddDays(((double)ingredientRecord.ShelfLife));
+                if (ingredientRecord.Surplus != null)
+                    i.surplus = (decimal)ingredientRecord.Surplus;
+                else
+                    i.surplus = null;
+                if (ingredientRecord.Purchases != null)
+                    i.amount = (decimal)ingredientRecord.Purchases;
+                else
+                    i.amount = ingredientRecord.Purchases;
+                if (ingredientRecord.ProducedDate != null)
+                    i.date = (DateTime)ingredientRecord.ProducedDate;
+                else
+                    i.date = ingredientRecord.ProducedDate;
+                if (i.date != null)
+                    ((DateTime)i.date).AddDays(((double)ingredientRecord.ShelfLife));
                 ret.Add(i);
             }
             return ret;
@@ -89,10 +99,20 @@ namespace youAreWhatYouEat.Controllers
                 var i = new IngredientRecordReplyItem();
                 i.record_id = ingredientRecord.RecordId;
                 i.ing_name = ingredientRecord.Ingr.IngrName;
-                i.surplus = (decimal)ingredientRecord.Surplus;
-                i.amount = (decimal)ingredientRecord.Purchases;
-                i.date = (DateTime)ingredientRecord.ProducedDate;
-                i.date.AddDays(((double)ingredientRecord.ShelfLife));
+                if (ingredientRecord.Surplus != null)
+                    i.surplus = (decimal)ingredientRecord.Surplus;
+                else
+                    i.surplus = null;
+                if (ingredientRecord.Purchases != null)
+                    i.amount = (decimal)ingredientRecord.Purchases;
+                else
+                    i.amount = ingredientRecord.Purchases;
+                if (ingredientRecord.ProducedDate != null)
+                    i.date = (DateTime)ingredientRecord.ProducedDate;
+                else
+                    i.date = ingredientRecord.ProducedDate;
+                if (i.date != null)
+                    ((DateTime)i.date).AddDays(((double)ingredientRecord.ShelfLife));
                 ret.Add(i);
             }
             return ret;
@@ -112,13 +132,10 @@ namespace youAreWhatYouEat.Controllers
             {
                 return Problem("Entity set 'ModelContext.IngredientRecords'  is null.");
             }
-            var i = await _context.IngredientRecords.FindAsync(p.record_id);
+            var i = await _context.IngredientRecords.FindAsync(Convert.ToDecimal(p.record_id));
             if (p.surplus >= 0.0M)
             {
-                if (i.Surplus >= p.surplus)
-                {
                     i.Surplus = p.surplus;
-                }
             }
             else
             {
@@ -148,9 +165,12 @@ namespace youAreWhatYouEat.Controllers
             i.RecordId = irri.record_id;
             i.ShelfLife = 7;
             i.Surplus = irri.surplus;
-            i.ProducedDate = irri.date;
-            i.PurchasingDate = irri.date;
+            i.ProducedDate = Convert.ToDateTime(irri.date);
+            i.PurchasingDate = Convert.ToDateTime(irri.date);
             i.Purchases = irri.amount;
+            var ing = await _context.Ingredients.FirstOrDefaultAsync(i => i.IngrName == irri.ing_name);
+            if (ing == null) return NoContent();
+            i.IngrId = ing.IngrId;
             try
             {
                 _context.IngredientRecords.Add(i);
