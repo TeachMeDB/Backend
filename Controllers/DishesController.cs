@@ -375,7 +375,7 @@ namespace youAreWhatYouEat.Controllers
             _context.Dishes.Remove(dish);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         private bool DishExists(decimal id)

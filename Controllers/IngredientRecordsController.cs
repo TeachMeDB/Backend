@@ -37,7 +37,7 @@ namespace youAreWhatYouEat.Controllers
             _context.IngredientRecords.Remove(ingredientRecord);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         public class IngredientRecordReplyItem
