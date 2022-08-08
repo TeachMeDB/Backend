@@ -6,31 +6,31 @@ using Newtonsoft.Json.Linq;
 
 namespace youAreWhatYouEat.Controllers
 {
-    public class UnixTimeUtil
-    {
-        /// <summary>
-        /// 将dateTime格式转换为Unix时间戳
-        /// </summary>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
-        public static int DateTimeToUnixTime(DateTime dateTime)
-        {
-            return (int)(dateTime - TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1))).TotalSeconds;
-        }
+    //public class UnixTimeUtil
+    //{
+    //    /// <summary>
+    //    /// 将dateTime格式转换为Unix时间戳
+    //    /// </summary>
+    //    /// <param name="dateTime"></param>
+    //    /// <returns></returns>
+    //    public static int DateTimeToUnixTime(DateTime dateTime)
+    //    {
+    //        return (int)(dateTime - TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1))).TotalSeconds;
+    //    }
 
-        /// <summary>
-        /// 将Unix时间戳转换为dateTime格式
-        /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        public static DateTime UnixTimeToDateTime(int time)
-        {
-            if (time < 0)
-                throw new ArgumentOutOfRangeException("time is out of range");
+    //    /// <summary>
+    //    /// 将Unix时间戳转换为dateTime格式
+    //    /// </summary>
+    //    /// <param name="time"></param>
+    //    /// <returns></returns>
+    //    public static DateTime UnixTimeToDateTime(int time)
+    //    {
+    //        if (time < 0)
+    //            throw new ArgumentOutOfRangeException("time is out of range");
 
-            return TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1)).AddSeconds(time);
-        }
-    }
+    //        return TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1)).AddSeconds(time);
+    //    }
+    //}
 
     [Route("api/[controller]")]
     [ApiController]
@@ -74,13 +74,19 @@ namespace youAreWhatYouEat.Controllers
 
         // GET: api/Orderlists/GetOrdersByTime
         [HttpGet("GetOrdersByTime")]
-        public async Task<ActionResult<OrderListMessage>> GetOrderlist(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<OrderListMessage>> GetOrderlist(string? begin, string? end)
         {
             OrderListMessage orderListMessage = new OrderListMessage();
             List<OrderInfo> orderMessages = new List<OrderInfo>();
 
+            DateTime start_time, end_time;
+            if (begin == null) start_time = DateTime.MinValue;
+            else start_time = Convert.ToDateTime(begin);
+            if (end == null) end_time = DateTime.MaxValue;
+            else end_time = Convert.ToDateTime(end);
+
             IEnumerable<Orderlist> orderListInfo = await _context.Orderlists
-                .Where(e => e.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Where(e => e.CreationTime >= start_time && e.CreationTime <= end_time)
                 .Include(e => e.Dishorderlists)
                 .ThenInclude(e => e.Dish)
                 .ToListAsync();
@@ -88,7 +94,7 @@ namespace youAreWhatYouEat.Controllers
             int tot_cnt = 0;
             decimal tot_cre = 0;
 
-            var p = await _context.Promotions.Where(e => e.StartTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.EndTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+            var p = await _context.Promotions.Where(e => e.StartTime >= start_time && e.EndTime <= end_time)
                 .Include(e => e.Hasdishes)
                 .ToListAsync();
             Dictionary<decimal, decimal> discount_dict = new Dictionary<decimal, decimal>();
@@ -239,10 +245,16 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetDishordersByTime")]
-        public async Task<ActionResult<DishOrderInfoReply>> GetDishorderlist(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<DishOrderInfoReply>> GetDishorderlist(string? begin, string? end)
         {
+            DateTime start_time, end_time;
+            if (begin == null) start_time = DateTime.MinValue;
+            else start_time = Convert.ToDateTime(begin);
+            if (end == null) end_time = DateTime.MaxValue;
+            else end_time = Convert.ToDateTime(end);
+
             var l = await _context.Dishorderlists
-                .Where(e => e.Order.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.Order.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Where(e => e.Order.CreationTime >= start_time && e.Order.CreationTime <= end_time)
                 .Include(e => e.Dish)
                 .Include(e => e.Order)
                 .ToListAsync();
@@ -280,10 +292,16 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetDishOrderNum")]
-        public async Task<ActionResult<DishOrderNumInfoReply>> GetDishOrderNum(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<DishOrderNumInfoReply>> GetDishOrderNum(string? begin, string? end)
         {
+            DateTime start_time, end_time;
+            if (begin == null) start_time = DateTime.MinValue;
+            else start_time = Convert.ToDateTime(begin);
+            if (end == null) end_time = DateTime.MaxValue;
+            else end_time = Convert.ToDateTime(end);
+
             var l = _context.Dishorderlists
-                .Where(e => e.Order.CreationTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.Order.CreationTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                .Where(e => e.Order.CreationTime >= start_time && e.Order.CreationTime <= end_time)
                 .ToList()
                 .GroupBy(e => e.DishId);
             DishOrderNumInfoReply ret = new DishOrderNumInfoReply();

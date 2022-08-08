@@ -68,7 +68,7 @@ namespace youAreWhatYouEat.Controllers
 
         // GET: api/Sensors/rawdata
         [HttpGet("rawdata")]
-        public async Task<ActionResult<SensorsGetRawDataMessage>> GetRawData(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<SensorsGetRawDataMessage>> GetRawData(string? begin, string? end)
         {
             if (_context.Sensors == null)
             {
@@ -85,8 +85,15 @@ namespace youAreWhatYouEat.Controllers
                     slm.sensor_model = s.SensModel;
                     slm.sensor_type = s.SensType;
                     slm.sensor_location = s.SensLocation;
+
+                    DateTime start_time, end_time;
+                    if (begin == null) start_time = DateTime.MinValue;
+                    else start_time = Convert.ToDateTime(begin);
+                    if (end == null) end_time = DateTime.MaxValue;
+                    else end_time = Convert.ToDateTime(end);
+
                     var sl = s.Sensorlogs
-                        .Where(e => e.SlogTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.SlogTime <= UnixTimeUtil.UnixTimeToDateTime(end));
+                        .Where(e => e.SlogTime >= start_time && e.SlogTime <= end_time);
                     foreach (var slg in s.Sensorlogs)
                     {
                         slm.log.Add(new SensorLogRecord(slg));
@@ -103,15 +110,21 @@ namespace youAreWhatYouEat.Controllers
 
         // GET: api/Sensors/used
         [HttpGet("used")]
-        public async Task<ActionResult<SensorsGetUsedResourcesMessage>> GetUsedResource(int begin = 0, int end = 2147483647)
+        public async Task<ActionResult<SensorsGetUsedResourcesMessage>> GetUsedResource(string? begin, string? end)
         {
             if (_context.Sensors == null)
             {
                 return NoContent();
             }
             SensorsGetUsedResourcesMessage ret = new SensorsGetUsedResourcesMessage();
-            ret.begin = UnixTimeUtil.UnixTimeToDateTime(begin);
-            ret.end = UnixTimeUtil.UnixTimeToDateTime(end);
+
+            DateTime start_time, end_time;
+            if (begin == null) start_time = DateTime.MinValue;
+            else start_time = Convert.ToDateTime(begin);
+            if (end == null) end_time = DateTime.MaxValue;
+            else end_time = Convert.ToDateTime(end);
+            ret.begin = start_time;
+            ret.end = end_time;
             try
             {
                 List<Sensor> lll = await _context.Sensors.Include(e => e.Sensorlogs).ToListAsync();
@@ -122,10 +135,10 @@ namespace youAreWhatYouEat.Controllers
                     foreach (var slg in s.AsEnumerable())
                     {
                         var l1 = slg.Sensorlogs
-                            .Where(e => e.SlogTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.SlogTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                            .Where(e => e.SlogTime >= start_time && e.SlogTime <= end_time)
                             .MaxBy(e => e.SlogTime);
                         var l2 = slg.Sensorlogs
-                            .Where(e => e.SlogTime >= UnixTimeUtil.UnixTimeToDateTime(begin) && e.SlogTime <= UnixTimeUtil.UnixTimeToDateTime(end))
+                            .Where(e => e.SlogTime >= start_time && e.SlogTime <= end_time)
                             .MinBy(e => e.SlogTime);
                         if (l1 == null || l2 == null)
                         {
