@@ -30,13 +30,26 @@ namespace youAreWhatYouEat.Controllers
             return new Config()
             {
                 Protocol = "https",
-                GatewayHost = "openapi.alipay.com",
+                GatewayHost = "openapi.alipaydev.com",
                 SignType = "RSA2",
 
-                // 下面的内容是假的，生产环境会进行替换
+                // 为避免私钥随源码泄露，推荐从文件中读取私钥字符串而不是写入源码中
                 AppId = "2021000121644403",
-                MerchantPrivateKey = "MIIEogIBAAKCAQEAoPAo9p3LeqUceDRm48kiPTZFJ+MeKPuK67lDLuP9nGX3qi51IlMC1VB6yqNLt3/h+xgLGP39lqhjz47rNRUKapS5AQFLU9DF/A0HeYiHMl4hHXIvOocE+4IoDf8RXVpggWZj3s1pVp8TImdReyR6QRMKy8iGIm4DCvb/s2UlKeptRvvlIoy3b9tHp/kNW3Z7hsBjnlg+g/8ISfcImxK+/IUxwwPsaTCxRkb866kHnc0KLnSYhpi0WvPX3KqnEKVI0fxMOsEyeqVdmMbw/0RRmBK5CjmavMABHrzl8aRekt0DT3fbsTgfaZefratKMiLRKYpzjoKR31R0qZ1+3opICwIDAQABAoIBAAanp6n7AG0D4td9ozuMF6RcWCO8GoUrUaVJteN8fgI3nTQmU6WltRpJB6rVcc4WtauCZQMVjaTrNaVhjYxWYGXj3HqUKR9AJM+1Yje+U4jbp5bmH9nVt3kG+s0JXRh1IkR3jW2rJM32Kf5kM1RaP8vtE6c1lYZa8jlD2XL7nbvL6pj7/jH6wDQ34qL2LCPWa5+lqzFzdF0/v5j2ofulK5W+zCdP/ptaH+bjw8qqjmmmKtSclpA4G3mk+HrlO4kDzdcHFXsQNoZ6r7p1jH11w13NGzu2eCHuUiAfJmqePcNAQgM5J68zA2Ge4u4Y6xtF2h9HOk+6jTf8qLxcnJsajPECgYEA/4vHxsQcMWJjLru13EvSMlmctw+O7ChFuDbcDR7NwLGsqy+SVS6XOGc6dgFPydSi0BmW+cCZ0Dkw6o6oJdk5iMQNes8rt6MRCPPLqUhQZO2LiXkgWGN7ABf3+oWE2xAVBMMiWZw8yJ9cBf2IZ1Mlyh+BX6RP7jmNiEoW9mxMRicCgYEAoTlaXCbOBs+uPU5t+YPH2wYZA7zS+X6qTq9UI4MmpfnCPdPa1RIZcrrOTgG+N4geR2wEbcOqR4hO6YntfiuUqtDSPdojBvZzDzLvqm4AgTTHs72GearYLND+HVJd0xkq3803MZB53gD/R5l6n/jH/s72OTuLiSWBVDAqbsdXIX0CgYBgWc27TdnrbNNEnZXWN+hK/6qtAvq6Y/zVliml8MVXMCaQbOFZqLVvmMxcDeaNjNTObbeU91+HOOkOpzcS/jJJNNJ4SYCMPrl/jJxveUqGo2IHNVpSuT95K5BeLtWG2ytxnjlnXBc29Y722z8A5kLLUNGww/03LxAEIRtDUlX35QKBgHAojgv9kuZ6JCTSIv+qBacBHvXSrpKS47fJkScDXiepENAiSeJgrQN7oXnzDHllYGsfYhVaQWNyGDOvmGBlwQ70Js6Qqj11xaWVMdXGoONB7IvGFX8eszS6T43mdw8cOw9mnDcG40DmQLF2vC/9ymQhZnl6SyAlz0raFyrp0luhAoGAJGt/aKboJ6hnzw4EhSBHUAXQgQSo0H3/OX/iX4cCzLFvwyJ7SDH72VdRlcR7aMr+f0t2B1wzwfwhHzKluj4PFodNrtcrcpQ+6gz+JfSUX26I41qOSFfBpc7UNb+1ZopdZ68kuZpaHZFi4z4IA/gWqe3TGhZApWht8SbdDwEyU8s=",
-                AlipayPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhnhgbXbuRJCxnZMc+GBpETCMRE7VKDDNKTi+t2UsxbwJgpdYTkDkrnymCNM0oOq3q0wfNVS6De5GMmSpzv0nm6zWSCD+leLEcTLsYpq3LOQ6wyUQNBCKH6SBCGYjtRWL4dSfdgdmT4xC/JtQit3ph3PK9bL5GHLwjbaHT1WOn7pEqUi9XB3dnSpNouHJnohbIG08DZeoz9LKvVU1w18Mc0G0iVWnOybU7gDy6txhTv83Bew1St9lsk95XmylxWur+PsnffT4R8zQiidkv13sSIbw3cpURDDFD8QwezVJ+m+r+ujY0MLStXrbU8def7RVvowuBB2HloWUU9Lt/3fPGQIDAQAB",
+                MerchantPrivateKey = "MIIEpQIBAAKCAQEAlxzdatJUTT2/IqzNBJVCb98p4822X4N44gtgoQU7xDbgvEFyfQEMGe3Wagc937SJ7mLJK9b+nRKzyjMcnOKvwkn27JGJjCOyrTDtM9f6M1aB8qXnS6nZmUu1eju6zh5wsb/OL0TWW1zd/NMXMAMDaVVmrPn7+ta5sGXJqdS4e3V5X4g+xFuZFlkPhtOMiKK0Hk63LNK4yU/SdkP+NhaCcJ6kTKQxLz/dEs0tihUZ5HFV3euCAoROgU/hlvM3xWEKQ36W06HMoeVAjhDkWI1PL+j7AlbplC3f+KVcLiWCmKJQIC23fOl0PX+9F0+39O0QRauelwO3FIRfMFGqFeMPTwIDAQABAoIBAF3FT7Dl6+IymtUNnftmE+AP/5KZKL6EexLqNIA3GytbUoH/quffKn88k30gGUkkYyNGscc+lqkp3d9vcCX6lU5fT5bliREpZcsLPWaac2xAFktYn/rX32u9C1RalEUrpormly/F666uJiKpaw4kEI3grOJSDgdOD9RilY2JryEMgHDV+6VaI3S+Dn0Azhfs86R8WXwnPmp5x0a6dSIbRXahHi4+iUdU07IAPqiNTpBcb3njkfqqXCI7sIEc6fAax27G7vgOqqwYb5znNTov4ny+kCGUnjnRmKAHtl+Ftn48o85uFJnT1jzG48XXVlrgfPxd7joftTj7wt3NYZGL0+ECgYEA7RUSiceFyGs27PPsQWUteadTUqce3yajYIvBSh65pkMY8N0fpeHSJ583+sqpcffFI5JlnbPYucgBC9hFQ8Vv8W0Kw+H063qK8A80/H9F1OGQTfaT/dfTLIADlHtVisNMQMMSZDDLcYDJGW7DaKbz10lF9x/zwvGjyS63HYzDTaUCgYEAoyus2NjxdQWrV88pmMmZKYj8QvRv+acngui2Py3lVe8WBlSfHI0ek2QZCLFlUPgcRX4KAm7faG3r8BPaU0w7LZNo4pY8/WNCrDdOaJuh/ms+798Wl/K+PtRb12pR7pfAqDv722sV07KvVXI90vRKmoajrhy0wfL6zHwgJ8YmfuMCgYEApcB0zIUFIIDszq8evv241HPKil+y8rq1wJsU0Pg4PWhtuIAwTy5ZWkAzyBAGdVqPpnYEu0Pwwrp1GM3kZyRTRkxBGYARVsy+9GT9W4az0Mi+tfMttmw9BMCfQCEWRkSSPDjl08xVgA5VCoXo8nK+ygY9dzAMoX+FTfNuLKesJ80CgYEAkJbxMa78N/BwJv2CJMvwFyg2MbadSyLeFljUtiObZ4zXfYCbBhffEkjPDi70Us2pb8MCZ6mL+uP9AN72xn10qyxG8xKitP6yZB0WNAhFgkfSm4iaYsdN4isXv0mNlNmQdQPCaGr6Cn/6csMrGbY0Lb5FaNIzMvJ3X6BWdihWkHUCgYEA01nwnI7tIMR7wW8aD2jgJOu+tv3mdDIqKO3WoyPOLo4THv8dGy8E4ZqTxNjJsApxJczdqoKezZ8FaJRWMwz5zO2Vrt+Yx4n4IBuct9G0ytMDPqVfGGuQmmRa4PIbKuY3hdKClJF64Lr+mQDZa6d4emm6MrkUN9TutCX26/NqG/0=",
+
+
+                MerchantCertPath = "appCertPublicKey_2021000121644403.crt",
+                AlipayCertPath = "alipayCertPublicKey_RSA2.crt",
+                AlipayRootCertPath = "alipayRootCert.crt",
+
+                // 如果采用非证书模式，则无需赋值上面的三个证书路径，改为赋值如下的支付宝公钥字符串即可
+                // AlipayPublicKey = "<-- 请填写您的支付宝公钥，例如：MIIBIjANBg... -->"
+
+                //可设置异步通知接收服务地址（可选）
+                // NotifyUrl = "<-- 请填写您的支付类接口异步通知接收服务地址，例如：https://www.test.com/callback -->",
+
+                //可设置AES密钥，调用AES加解密相关接口时需要（可选）
+                // EncryptKey = "<-- 请填写您的AES密钥，例如：aa4BtZ4tspm2wnXLb1ThQA== -->"
             };
         }
 
@@ -44,21 +57,28 @@ namespace youAreWhatYouEat.Controllers
         [HttpGet]
         public string TryAlipay()
         {
-            var ret = "ERR";
+            var ret = "233";
             Factory.SetOptions(GetConfig());
-            // 2. 发起API调用（以创建当面付收款二维码为例）
-            AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace()
-                .PreCreate("Apple iPhone11 128G", "2234567234842", "5799.00");
-            // 3. 处理响应或异常
-            if (ResponseChecker.Success(response))
+            try
             {
-                Console.WriteLine("调用成功");
-                ret = response.ToString();
+                // 2. 发起API调用（以创建当面付收款二维码为例）
+                AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace()
+                    .PreCreate("Apple iPhone11 128G", "2234567234894", "5799.00");
+                // 3. 处理响应或异常
+                if (ResponseChecker.Success(response))
+                {
+                    Console.WriteLine("调用成功");
+                    ret = response.QrCode;
+                }
+                else
+                {
+                    Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
-                ret = "调用失败，原因：" + response.Msg + "，" + response.SubMsg;
+                Console.WriteLine("调用遭遇异常，原因：" + ex.Message);
+                throw ex;
             }
             return ret;
         }
