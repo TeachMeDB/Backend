@@ -308,13 +308,13 @@ namespace youAreWhatYouEat.Controllers
                         if (avatar != null)
                         {
                             byte[] base64 = Convert.FromBase64String(avatar);
-                            string path = "/images/employees/employee_" + id + ".png";
+                            string path = "/images/employees/employee_" + employee.Id.ToString() + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         if (cover != null)
                         {
                             byte[] base64 = Convert.FromBase64String(cover);
-                            string path = "/images/covers/cover_" + id + ".png";
+                            string path = "/images/covers/cover_" + employee.Id.ToString() + ".png";
                             System.IO.File.WriteAllBytes(path, base64);
                         }
                         return Created("", true);
