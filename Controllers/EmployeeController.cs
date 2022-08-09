@@ -30,6 +30,7 @@ namespace youAreWhatYouEat.Controllers
             public decimal? Attendance_rate { get; set; }
             public int? Award_times { get; set; }
             public string? avatar { get; set; }
+            public string? cover { get; set; }
         }
 
         public class AttendInfo
@@ -105,6 +106,7 @@ namespace youAreWhatYouEat.Controllers
                 if (employee.Birthday != null) tem.Birthday = ((DateTime)employee.Birthday).ToString("yyyy-MM-dd");
                 else tem.Birthday = null;
                 tem.avatar = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "employees/employee_" + tem.Id.ToString() + ".png";
+                tem.cover = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "covers/cover_" + tem.Id.ToString() + ".png";
 
                 decimal tot = 0, participant = 0;
                 foreach (Attend item in employee.Attends)
