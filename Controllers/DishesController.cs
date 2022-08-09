@@ -49,6 +49,7 @@ namespace youAreWhatYouEat.Controllers
             public string? description { get; set; } = string.Empty;
             public List<string>? tags { get; set; } = new List<string>();
             public string? picture { get; set; }
+            public string? video { get; set; }
         }
 
 
@@ -193,7 +194,7 @@ namespace youAreWhatYouEat.Controllers
                 return NoContent();
             }
             dm = new Dish();
-            dm.DishDescription = dish.description;
+            dm.DishDescription = dish.description + "#" + dish.video;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
             dm.DishId = dish.id;
