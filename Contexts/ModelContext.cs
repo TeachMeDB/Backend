@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Configuration;
 
 namespace youAreWhatYouEat.Models
 {
@@ -40,6 +38,7 @@ namespace youAreWhatYouEat.Models
         public virtual DbSet<Prize> Prizes { get; set; } = null!;
         public virtual DbSet<Promotion> Promotions { get; set; } = null!;
         public virtual DbSet<Provide> Provides { get; set; } = null!;
+        public virtual DbSet<Repair> Repairs { get; set; } = null!;
         public virtual DbSet<Salary> Salaries { get; set; } = null!;
         public virtual DbSet<Sensor> Sensors { get; set; } = null!;
         public virtual DbSet<Sensorlog> Sensorlogs { get; set; } = null!;
@@ -52,7 +51,6 @@ namespace youAreWhatYouEat.Models
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseOracle(System.Configuration.ConfigurationManager.ConnectionStrings["OracleDatabase"].ConnectionString);
-                /*optionsBuilder.UseOracle("********************************************************************");*/
             }
         }
 
@@ -384,6 +382,10 @@ namespace youAreWhatYouEat.Models
                     .HasColumnType("NUMBER(38)")
                     .HasColumnName("ID");
 
+                entity.Property(e => e.Birthday)
+                    .HasColumnType("DATE")
+                    .HasColumnName("BIRTHDAY");
+
                 entity.Property(e => e.Gender)
                     .HasMaxLength(6)
                     .IsUnicode(false)
@@ -398,10 +400,6 @@ namespace youAreWhatYouEat.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("OCCUPATION");
-
-                entity.Property(e =>e.Birthday)
-                    .HasColumnType("DATE")
-                    .HasColumnName("BIRTHDAY");
 
                 entity.HasOne(d => d.OccupationNavigation)
                     .WithMany(p => p.Employees)
@@ -563,6 +561,10 @@ namespace youAreWhatYouEat.Models
                     .HasColumnType("NUMBER(38)")
                     .HasColumnName("EMPLOYEE_ID");
 
+                entity.Property(e => e.Repair)
+                    .HasColumnType("NUMBER(38)")
+                    .HasColumnName("REPAIR");
+
                 entity.HasOne(d => d.Assets)
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.AssetsId)
@@ -572,6 +574,11 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("SYS_C0011106");
+
+                entity.HasOne(d => d.RepairNavigation)
+                    .WithMany(p => p.Manages)
+                    .HasForeignKey(d => d.Repair)
+                    .HasConstraintName("FK_REPAIR");
             });
 
             modelBuilder.Entity<OrderNumber>(entity =>
@@ -795,6 +802,35 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Provides)
                     .HasForeignKey(d => d.SId)
                     .HasConstraintName("SYS_C0011145");
+            });
+
+            modelBuilder.Entity<Repair>(entity =>
+            {
+                entity.ToTable("REPAIR");
+
+                entity.Property(e => e.RepairId)
+                    .HasColumnType("NUMBER(38)")
+                    .HasColumnName("REPAIR_ID");
+
+                entity.Property(e => e.Latitude)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("LATITUDE");
+
+                entity.Property(e => e.Longitude)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("LONGITUDE");
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(150)
+                    .IsUnicode(false)
+                    .HasColumnName("NAME");
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("PHONE");
             });
 
             modelBuilder.Entity<Salary>(entity =>

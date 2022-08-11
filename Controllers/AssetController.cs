@@ -16,6 +16,14 @@ namespace youAreWhatYouEat.Controllers
             _context = new ModelContext();
         }
 
+        public class RepairInfo
+        {
+            public string? name { get; set; }
+            public string? phone { get; set; }
+            public string? longitude { get; set; }
+            public string? latitude { get; set; }
+        }
+
         public class AssetInfo
         {
             public string? assets_id { get; set; }
@@ -23,6 +31,7 @@ namespace youAreWhatYouEat.Controllers
             public int? employee_id { get; set; }
             public string? employee_name { get; set; }
             public string? assets_status { get; set; }
+            public List<RepairInfo>? repair  = new List<RepairInfo>();
         }
 
         public class AssetMessage
@@ -40,6 +49,8 @@ namespace youAreWhatYouEat.Controllers
             {
                 var assets = await _context.Assets
                     .Include(a => a.Employee)
+                    .Include(a => a.Manages)
+                        .ThenInclude(m => m.RepairNavigation)
                     .FirstOrDefaultAsync(a =>a.AssetsType == assets_type);
                 if (assets == null) return NoContent();
 
@@ -50,12 +61,24 @@ namespace youAreWhatYouEat.Controllers
                 info.employee_id = Convert.ToInt32(assets.EmployeeId);
                 info.assets_status = (assets.AssetsStatus == 0) ? "正常" : "已坏";
                 info.employee_name = assets.Employee.Name;
+
+                foreach (var item in assets.Manages)
+                {
+                    RepairInfo repair = new RepairInfo();
+                    repair.name = item.RepairNavigation.Name;
+                    repair.phone = item.RepairNavigation.Phone;
+                    repair.longitude = item.RepairNavigation.Longitude;
+                    repair.latitude = item.RepairNavigation.Latitude;
+                    info.repair.Add(repair);
+                }
                 msg.data.Add(info);
             }
             else
             {
                 var assets = await _context.Assets
                     .Include(a => a.Employee)
+                    .Include(a => a.Manages)
+                        .ThenInclude(m => m.RepairNavigation)
                     .ToListAsync();
 
                 foreach (var asset in assets)
@@ -66,6 +89,16 @@ namespace youAreWhatYouEat.Controllers
                     info.employee_id = Convert.ToInt32(asset.EmployeeId);
                     info.assets_status = (asset.AssetsStatus == 0) ? "正常" : "已坏";
                     info.employee_name = asset.Employee.Name;
+
+                    foreach (var item in asset.Manages)
+                    {
+                        RepairInfo repair = new RepairInfo();
+                        repair.name = item.RepairNavigation.Name;
+                        repair.phone = item.RepairNavigation.Phone;
+                        repair.longitude = item.RepairNavigation.Longitude;
+                        repair.latitude = item.RepairNavigation.Latitude;
+                        info.repair.Add(repair);
+                    }
                     msg.data.Add(info);
                 }
                 msg.total = msg.data.Count;
