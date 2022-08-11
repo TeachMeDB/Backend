@@ -179,7 +179,7 @@ namespace youAreWhatYouEat.Controllers
                         }
                     }
 
-                    if(!dtag)
+                    if (!dtag)
                         dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
                 }
                 catch (Exception ex)
@@ -391,6 +391,8 @@ namespace youAreWhatYouEat.Controllers
                 DishOrderItem ditem = new DishOrderItem();
                 ditem.status = item.DishStatus;
                 ditem.dish_name = item.Dish.DishName;
+                ditem.dish_order_id = item.DishOrderId;
+                ditem.remark = getredis(item.DishOrderId + ":remark");
                 ret.dish.Add(ditem);
             }
             return Ok(ret);
