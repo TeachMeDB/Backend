@@ -92,11 +92,18 @@ namespace youAreWhatYouEat.Controllers
         public async Task<ActionResult<FinalPayRes>> FinalPay(string order_id)
         {
             FinalPayRes ret = new FinalPayRes();
-            long timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            // long timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
             var order = await _context.Orderlists
             .Include(o => o.Dishorderlists)
             .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NoContent();
+            if (order == null)
+            {
+                return NoContent();
+            }
+            if (order.OrderStatus == "已支付")
+            {
+                return NoContent();
+            }
             decimal price = 0;
             foreach (var item in order.Dishorderlists)
             {
@@ -115,7 +122,7 @@ namespace youAreWhatYouEat.Controllers
                 }
                 else
                 {
-                    // Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
+                    Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
                     return NotFound();
                 }
             }
@@ -156,10 +163,6 @@ namespace youAreWhatYouEat.Controllers
                         order.OrderStatus = "已支付";
                         await _context.SaveChangesAsync();
                     }
-                }
-                else
-                {
-                    return NoContent();
                 }
             }
             catch (Exception ex)

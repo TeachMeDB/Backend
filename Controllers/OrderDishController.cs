@@ -121,7 +121,7 @@ namespace youAreWhatYouEat.Controllers
                 d.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
 
                 d.dish_discount = 1;
-                foreach(var pro in dish.Hasdishes)
+                foreach (var pro in dish.Hasdishes)
                 {
                     if (pro.PromotionId == promotion_id)
                     {
@@ -129,10 +129,10 @@ namespace youAreWhatYouEat.Controllers
                         break;
                     }
                 }
-                
+
                 decimal rate = 0;
                 decimal count = 0;
-                foreach(var cmt in dish.CommentOnDishes)
+                foreach (var cmt in dish.CommentOnDishes)
                 {
                     if (cmt.Stars == null) continue;
                     rate += Convert.ToInt32(cmt.Stars);
@@ -165,7 +165,7 @@ namespace youAreWhatYouEat.Controllers
 
             PriceInfo info = new PriceInfo();
             decimal price = 0;
-            foreach(var item in order.Dishorderlists)
+            foreach (var item in order.Dishorderlists)
             {
                 price += item.FinalPayment;
             }
@@ -179,20 +179,20 @@ namespace youAreWhatYouEat.Controllers
             public string? order_status { get; set; }
         }
 
-/*        // GET 获取订单支付状态
-        [HttpGet("GetOrderStatus")]
-        public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
-        {
-            if (order_id == null) return BadRequest();
-            var order = await _context.Orderlists
-                .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null) return NoContent();
+        /*        // GET 获取订单支付状态
+                [HttpGet("GetOrderStatus")]
+                public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
+                {
+                    if (order_id == null) return BadRequest();
+                    var order = await _context.Orderlists
+                        .FirstOrDefaultAsync(o => o.OrderId == order_id);
+                    if (order == null) return NoContent();
 
-            StatusInfo info = new StatusInfo();
-            info.order_status = order.OrderStatus;
+                    StatusInfo info = new StatusInfo();
+                    info.order_status = order.OrderStatus;
 
-            return Ok(info);
-        }*/
+                    return Ok(info);
+                }*/
 
         public class PromotionDish2
         {
@@ -317,11 +317,11 @@ namespace youAreWhatYouEat.Controllers
                 else rate = rate / count;
                 info.dish_rate = rate;
 
-                foreach(var tag in d.Dtags)
+                foreach (var tag in d.Dtags)
                 {
                     info.dish_tag.Add(tag.DtagName);
                 }
-                foreach(var dis in d.Hasdishes)
+                foreach (var dis in d.Hasdishes)
                 {
                     info.dish_discount.Add(Convert.ToDecimal(dis.Discount));
                 }
@@ -346,7 +346,7 @@ namespace youAreWhatYouEat.Controllers
                 .FirstOrDefaultAsync(p => p.PromotionId == promotion_id);
             if (pro == null) return NoContent();
 
-            foreach(var dish in pro.Hasdishes)
+            foreach (var dish in pro.Hasdishes)
             {
                 if (dish.DishId == dish_id)
                 {
@@ -406,12 +406,14 @@ namespace youAreWhatYouEat.Controllers
             {
                 _context.Orderlists.Add(order);
                 await _context.SaveChangesAsync();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
 
-            for (int t = 0; t < p.dishes_info.Count; t++) {
+            for (int t = 0; t < p.dishes_info.Count; t++)
+            {
                 for (int k = 0; k < p.dishes_info[t].dish_num; k++)
                 {
                     Dishorderlist dish_order = new Dishorderlist();
@@ -437,6 +439,7 @@ namespace youAreWhatYouEat.Controllers
                         }
                     } while (dish_orders.IndexOf(dish_order_id) != -1);
                     dish_order.DishOrderId = dish_order_id;
+                    dish_order.FinalPayment = dish_order.Dish.DishPrice;
 
                     try
                     {
@@ -472,7 +475,8 @@ namespace youAreWhatYouEat.Controllers
             {
                 await _context.SaveChangesAsync();
                 return Ok();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
@@ -523,7 +527,8 @@ namespace youAreWhatYouEat.Controllers
                 _context.CommentOnDishes.Add(cmt);
                 await _context.SaveChangesAsync();
                 return Ok();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
