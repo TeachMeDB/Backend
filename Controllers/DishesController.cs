@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
+using StackExchange.Redis;
 
 namespace youAreWhatYouEat.Controllers
 {
@@ -18,6 +19,23 @@ namespace youAreWhatYouEat.Controllers
         public DishesController()
         {
             _context = new ModelContext();
+        }
+
+        static private string? putredis(string k, string v)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            db.StringSet(k, v);
+            var value = db.StringGet(k);
+            return value;
+        }
+
+        static private string? getredis(string k)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            var value = db.StringGet(k);
+            return value;
         }
 
         // GET: api/Dishes/GetDishNameById
@@ -142,6 +160,7 @@ namespace youAreWhatYouEat.Controllers
                 .FirstOrDefaultAsync(d => d.DishId == dish.id);
 
             dm.DishDescription = dish.description;
+            putredis(dm.DishId + ":video", dish.video);
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
             dm.Dtags.Clear();
@@ -194,7 +213,8 @@ namespace youAreWhatYouEat.Controllers
                 return NoContent();
             }
             dm = new Dish();
-            dm.DishDescription = dish.description + "#" + dish.video;
+            dm.DishDescription = dish.description;
+            putredis(dm.DishId + ":video", dish.video);
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
             dm.DishId = dish.id;
@@ -320,6 +340,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dish_name { get; set; } = string.Empty;
             public string? status { get; set; } = null;
             public string? dish_order_id { get; set; } = String.Empty;
+            public string? remark { get; set; } = null;
         }
 
         public class DishOrderListItem
@@ -349,6 +370,7 @@ namespace youAreWhatYouEat.Controllers
                     ditem.status = item.DishStatus;
                     ditem.dish_name = item.Dish.DishName;
                     ditem.dish_order_id = item.DishOrderId;
+                    ditem.remark = getredis(item.DishOrderId + ":remark");
                     dishOrderListItem.dish.Add(ditem);
                 }
                 ret.Add(dishOrderListItem);

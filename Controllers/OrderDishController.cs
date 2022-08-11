@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
+using StackExchange.Redis;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,6 +15,23 @@ namespace youAreWhatYouEat.Controllers
         public OrderDishController()
         {
             _context = new ModelContext();
+        }
+
+        static private string? putredis(string k, string? v)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            db.StringSet(k, v);
+            var value = db.StringGet(k);
+            return value;
+        }
+
+        static private string? getredis(string k)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            var value = db.StringGet(k);
+            return value;
         }
 
         public class DishInfo
@@ -361,13 +379,17 @@ namespace youAreWhatYouEat.Controllers
 
         public class OrderInfo3
         {
-            public int? dish_id { get; set; }
-            public int? dish_num { get; set; }
+            public int dish_id { get; set; }
+            public int dish_num { get; set; }
+            public decimal dish_price_to_pay { get; set; } = 0;
+
+            public string? remark { get; set; } = null;
         }
 
         public class PostOrderInfo
         {
             public List<OrderInfo3> dishes_info { get; set; }
+            public decimal table_id { get; set; }
         }
 
         public class ReturnOrder
@@ -401,7 +423,7 @@ namespace youAreWhatYouEat.Controllers
                 }
             } while (orders.IndexOf(order_id) != -1);
             order.OrderId = order_id;
-
+            order.TableId = p.table_id;
             try
             {
                 _context.Orderlists.Add(order);
@@ -440,7 +462,8 @@ namespace youAreWhatYouEat.Controllers
                     } while (dish_orders.IndexOf(dish_order_id) != -1);
                     dish_order.DishOrderId = dish_order_id;
                     var td = await _context.Dishes.FindAsync(dish_order.DishId);
-                    dish_order.FinalPayment = td.DishPrice;
+                    dish_order.FinalPayment = p.dishes_info[t].dish_price_to_pay;
+                    putredis(dish_order.DishOrderId + ":remark", p.dishes_info[t].remark);
 
                     try
                     {
