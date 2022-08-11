@@ -50,8 +50,7 @@ namespace youAreWhatYouEat.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseOracle("User Id=DBKS01;Password=jiaojiaodb;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=120.55.47.55)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=xe)));");
+                optionsBuilder.UseOracle(System.Configuration.ConfigurationManager.ConnectionStrings["OracleDatabase"].ConnectionString);
             }
         }
 
