@@ -439,7 +439,8 @@ namespace youAreWhatYouEat.Controllers
                         }
                     } while (dish_orders.IndexOf(dish_order_id) != -1);
                     dish_order.DishOrderId = dish_order_id;
-                    dish_order.FinalPayment = dish_order.Dish.DishPrice;
+                    var td = await _context.Dishes.FindAsync(dish_order.DishId);
+                    dish_order.FinalPayment = td.DishPrice;
 
                     try
                     {

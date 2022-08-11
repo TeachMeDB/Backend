@@ -10,6 +10,7 @@ using Alipay.EasySDK.Factory;
 using Alipay.EasySDK.Kernel;
 using Alipay.EasySDK.Kernel.Util;
 using Alipay.EasySDK.Payment.FaceToFace.Models;
+using StackExchange.Redis;
 
 namespace youAreWhatYouEat.Controllers
 {
@@ -51,6 +52,23 @@ namespace youAreWhatYouEat.Controllers
                 //可设置AES密钥，调用AES加解密相关接口时需要（可选）
                 // EncryptKey = "<-- 请填写您的AES密钥，例如：aa4BtZ4tspm2wnXLb1ThQA== -->"
             };
+        }
+
+        static private string? putredis(string k, string v)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            db.StringSet(k, v);
+            var value = db.StringGet(k);
+            return value;
+        }
+
+        static private string? getredis(string k)
+        {
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+            IDatabase db = redis.GetDatabase();
+            var value = db.StringGet(k);
+            return value;
         }
 
         // GET: api/OrderNumbers
@@ -110,20 +128,39 @@ namespace youAreWhatYouEat.Controllers
                 price += item.FinalPayment;
             }
             Factory.SetOptions(GetConfig());
+            string oid = order.CreationTime.ToString("yyyyMMddHHmmss");
+            string? payid = getredis(oid);
             try
             {
-                AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace()
-                    .PreCreate("菜品结算", order.CreationTime.ToString("yyyyMMddHHmmss"), price.ToString());
-                if (ResponseChecker.Success(response))
+                if (payid != null)
                 {
-                    // Console.WriteLine("调用成功");
-                    ret.qrcode = response.QrCode;
-                    // await _context.SaveChangesAsync();
+/*                    if (getredis("status:" + payid) == "Waiting")
+                    {
+                        ret.qrcode = getredis("qr:" + oid);
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }*/
+                    ret.qrcode = getredis("qr:" + oid);
                 }
                 else
                 {
-                    Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
-                    return NotFound();
+                    AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace().PreCreate("菜品结算", oid, price.ToString());
+                    if (ResponseChecker.Success(response))
+                    {
+                        // Console.WriteLine("调用成功");
+                        ret.qrcode = response.QrCode;
+                        putredis(oid, response.OutTradeNo);
+                        putredis("qr:" + oid, response.QrCode);
+                        putredis("status:" + response.OutTradeNo, "Waiting");
+                        // await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
+                        return NotFound();
+                    }
                 }
             }
             catch (Exception ex)
@@ -142,7 +179,7 @@ namespace youAreWhatYouEat.Controllers
 
         // GET 获取订单支付状态
         [HttpGet("GetOrderStatus")]
-        public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
+        public async Task<ActionResult<StatusInfo>> GetOrderStatus(string order_id)
         {
             if (order_id == null) return BadRequest();
             var order = await _context.Orderlists
@@ -150,17 +187,23 @@ namespace youAreWhatYouEat.Controllers
             if (order == null) return NoContent();
             StatusInfo info = new StatusInfo();
 
-            string payid = order.CreationTime.ToString("yyyyMMddHHmmss");
+            string oid = order.CreationTime.ToString("yyyyMMddHHmmss");
+            string? payid = getredis(oid);
 
+            if (payid == null)
+            {
+                return Ok(order.OrderStatus);
+            }
             Factory.SetOptions(GetConfig());
             try
             {
                 var response = Factory.Payment.Common().Query(payid);
                 if (ResponseChecker.Success(response))
                 {
-                    if (response.SubCode == "ACQ.TRADE_HAS_SUCCESS")
+                    if (response.TradeStatus == "TRADE_SUCCESS")
                     {
                         order.OrderStatus = "已支付";
+                        putredis("status:" + response.OutTradeNo, "Done");
                         await _context.SaveChangesAsync();
                     }
                 }
@@ -176,5 +219,23 @@ namespace youAreWhatYouEat.Controllers
 
             return Ok(info);
         }
+
+        /*        [HttpPost("redis")]
+                public ActionResult<string> testpostredis(string k, string v)
+                {
+                    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+                    IDatabase db = redis.GetDatabase();
+                    db.StringSet(k, v);
+                    var value = db.StringGet(k);
+                    return Ok(value);
+                }
+                [HttpGet("redis")]
+                public ActionResult<string> testgetredis(string k)
+                {
+                    ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(System.Configuration.ConfigurationManager.ConnectionStrings["Redis"].ConnectionString);
+                    IDatabase db = redis.GetDatabase();
+                    var value = db.StringGet(k);
+                    return Ok(value);
+                }*/
     }
 }
