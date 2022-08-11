@@ -11,8 +11,10 @@ namespace youAreWhatYouEat.Models
         public DateTime ManageDate { get; set; }
         public string ManageReason { get; set; } = null!;
         public string ManageCost { get; set; } = null!;
+        public decimal? Repair { get; set; }
 
         public virtual Asset Assets { get; set; } = null!;
         public virtual Employee Employee { get; set; } = null!;
+        public virtual Repair? RepairNavigation { get; set; }
     }
 }
