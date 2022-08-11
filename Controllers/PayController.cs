@@ -82,5 +82,96 @@ namespace youAreWhatYouEat.Controllers
             }
             return ret;
         }
+
+        public class FinalPayRes
+        {
+            public string qrcode { get; set; } = String.Empty;
+        }
+
+        [HttpGet("FinalPay")]
+        public async Task<ActionResult<FinalPayRes>> FinalPay(string order_id)
+        {
+            FinalPayRes ret = new FinalPayRes();
+            long timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var order = await _context.Orderlists
+            .Include(o => o.Dishorderlists)
+            .FirstOrDefaultAsync(o => o.OrderId == order_id);
+            if (order == null) return NoContent();
+            decimal price = 0;
+            foreach (var item in order.Dishorderlists)
+            {
+                price += item.FinalPayment;
+            }
+            Factory.SetOptions(GetConfig());
+            try
+            {
+                AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace()
+                    .PreCreate("菜品结算", order.CreationTime.ToString("yyyyMMddHHmmss"), price.ToString());
+                if (ResponseChecker.Success(response))
+                {
+                    // Console.WriteLine("调用成功");
+                    ret.qrcode = response.QrCode;
+                    // await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    // Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
+                    return NotFound();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Console.WriteLine("调用遭遇异常，原因：" + ex.Message);
+                // throw ex;
+                return StatusCode(500);
+            }
+            return Ok(ret);
+        }
+
+        public class StatusInfo
+        {
+            public string order_status { get; set; } = String.Empty;
+        }
+
+        // GET 获取订单支付状态
+        [HttpGet("GetOrderStatus")]
+        public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
+        {
+            if (order_id == null) return BadRequest();
+            var order = await _context.Orderlists
+                .FirstOrDefaultAsync(o => o.OrderId == order_id);
+            if (order == null) return NoContent();
+            StatusInfo info = new StatusInfo();
+
+            string payid = order.CreationTime.ToString("yyyyMMddHHmmss");
+
+            Factory.SetOptions(GetConfig());
+            try
+            {
+                var response = Factory.Payment.Common().Query(payid);
+                if (ResponseChecker.Success(response))
+                {
+                    if (response.SubCode == "ACQ.TRADE_HAS_SUCCESS")
+                    {
+                        order.OrderStatus = "已支付";
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Console.WriteLine("调用遭遇异常，原因：" + ex.Message);
+                // throw ex;
+                return NoContent();
+            }
+
+            info.order_status = order.OrderStatus;
+
+            return Ok(info);
+        }
     }
 }

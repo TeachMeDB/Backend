@@ -179,7 +179,7 @@ namespace youAreWhatYouEat.Controllers
             public string? order_status { get; set; }
         }
 
-        // GET 获取订单支付状态
+/*        // GET 获取订单支付状态
         [HttpGet("GetOrderStatus")]
         public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
         {
@@ -192,7 +192,7 @@ namespace youAreWhatYouEat.Controllers
             info.order_status = order.OrderStatus;
 
             return Ok(info);
-        }
+        }*/
 
         public class PromotionDish2
         {
