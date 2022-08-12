@@ -264,6 +264,11 @@ namespace youAreWhatYouEat.Models
                     .HasColumnType("NUMBER(9,2)")
                     .HasColumnName("DISH_PRICE");
 
+                entity.Property(e => e.Video)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("VIDEO");
+
                 entity.HasMany(d => d.Chefs)
                     .WithMany(p => p.Dishes)
                     .UsingEntity<Dictionary<string, object>>(
@@ -345,6 +350,11 @@ namespace youAreWhatYouEat.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("ORDER_ID");
+
+                entity.Property(e => e.remark)
+                    .HasMaxLength(150)
+                    .IsUnicode(false)
+                    .HasColumnName("REMARK");
 
                 entity.HasOne(d => d.Dish)
                     .WithMany(p => p.Dishorderlists)

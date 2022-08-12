@@ -214,7 +214,8 @@ namespace youAreWhatYouEat.Controllers
             }
             dm = new Dish();
             dm.DishDescription = dish.description;
-            putredis(dm.DishId + ":video", dish.video);
+            dm.Video = dish.video;
+            //putredis(dm.DishId + ":video", dish.video);
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
             dm.DishId = dish.id;
@@ -370,7 +371,8 @@ namespace youAreWhatYouEat.Controllers
                     ditem.status = item.DishStatus;
                     ditem.dish_name = item.Dish.DishName;
                     ditem.dish_order_id = item.DishOrderId;
-                    ditem.remark = getredis(item.DishOrderId + ":remark");
+                    //ditem.remark = getredis(item.DishOrderId + ":remark");
+                    ditem.remark = item.remark;
                     dishOrderListItem.dish.Add(ditem);
                 }
                 ret.Add(dishOrderListItem);

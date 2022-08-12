@@ -291,6 +291,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dish_picture { get; set; }
             public decimal? dish_price { get; set; }
             public decimal? dish_rate { get; set; }
+            public string? dish_video { get; set; }
             public string? dish_description { get; set; }
             public List<decimal>? dish_discount = new List<decimal>();
             public List<string>? dish_tag = new List<string>();
@@ -315,6 +316,7 @@ namespace youAreWhatYouEat.Controllers
                 info.dish_name = d.DishName;
                 info.dish_price = d.DishPrice;
                 info.dish_description = d.DishDescription;
+                info.dish_video = d.Video;
                 info.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + d.DishId.ToString() + ".png";
 
                 decimal rate = 0;
@@ -382,7 +384,6 @@ namespace youAreWhatYouEat.Controllers
             public int dish_id { get; set; }
             public int dish_num { get; set; }
             public decimal dish_price_to_pay { get; set; } = 0;
-
             public string? remark { get; set; } = null;
         }
 
@@ -463,7 +464,8 @@ namespace youAreWhatYouEat.Controllers
                     dish_order.DishOrderId = dish_order_id;
                     var td = await _context.Dishes.FindAsync(dish_order.DishId);
                     dish_order.FinalPayment = p.dishes_info[t].dish_price_to_pay;
-                    putredis(dish_order.DishOrderId + ":remark", p.dishes_info[t].remark);
+                    dish_order.remark = p.dishes_info[t].remark;
+                    //putredis(dish_order.DishOrderId + ":remark", p.dishes_info[t].remark);
 
                     try
                     {

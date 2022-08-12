@@ -19,6 +19,7 @@ namespace youAreWhatYouEat.Models
         public string DishName { get; set; } = null!;
         public decimal DishPrice { get; set; }
         public string DishDescription { get; set; } = null!;
+        public string? Video { get; set; }
 
         public virtual ICollection<CommentOnDish> CommentOnDishes { get; set; }
         public virtual ICollection<Dishorderlist> Dishorderlists { get; set; }
