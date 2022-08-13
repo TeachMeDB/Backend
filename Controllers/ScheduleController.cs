@@ -69,15 +69,15 @@ namespace youAreWhatYouEat.Controllers
             List<ScheduleInfo> infos = new List<ScheduleInfo>();
             foreach (WorkPlan schedule in scheduleInfo)
             {
-                if ((start_time == null || start_time <= schedule.TimeStart) && (end_time == null || end_time >= 
-                    schedule.TimeEnd) && (place == null || schedule.Place == place) && (occupation == null || 
+                if ((start_time == null || start_time <= schedule.TimeStart) && (end_time == null || end_time >=
+                    schedule.TimeEnd) && (place == null || schedule.Place == place) && (occupation == null ||
                     schedule.Occupation == occupation))
                 {
                     bool tag = true;
                     if (id != null)
                     {
                         tag = false;
-                        foreach(Attend attend in schedule.Attends)
+                        foreach (Attend attend in schedule.Attends)
                         {
                             if (attend.Employee.Id.ToString() == id)
                             {
@@ -129,9 +129,9 @@ namespace youAreWhatYouEat.Controllers
                 .Where(w => (w.TimeStart <= end_date && w.TimeEnd >= start_date))
                 .ToListAsync();
             List<decimal> busyIds = new List<decimal>();
-            foreach(var work in workInfo)
+            foreach (var work in workInfo)
             {
-                foreach(var attend in work.Attends)
+                foreach (var attend in work.Attends)
                 {
                     if (!busyIds.Exists(b => b == attend.EmployeeId))
                         busyIds.Add(attend.EmployeeId);
@@ -141,7 +141,7 @@ namespace youAreWhatYouEat.Controllers
             var employees = await _context.Employees.ToListAsync();
             List<EmployeeInfo2> info = new List<EmployeeInfo2>();
 
-            foreach(var employee in employees)
+            foreach (var employee in employees)
             {
                 if ((occupation == null || employee.Occupation == occupation) && !busyIds.Exists(b => b == employee.Id))
                 {
@@ -191,7 +191,8 @@ namespace youAreWhatYouEat.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(true);
 
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -217,6 +218,37 @@ namespace youAreWhatYouEat.Controllers
             {
                 return BadRequest(ex);
             }
+        }
+
+        [HttpGet("attend")]
+        public async Task<ActionResult<string>> HardwareAttend(string id)
+        {
+            decimal eid = Convert.ToDecimal(id);
+            var employee = await _context.Employees.FindAsync(eid);
+            if (employee == null)
+            {
+                return NoContent();
+            }
+            try
+            {
+                /*Console.WriteLine(DateTime.Now.ToShortTimeString() + employee.Name);*/
+                DateTime now = DateTime.Now;
+                TimeSpan ts = TimeSpan.FromMinutes(10);
+                var atts = await _context.Attends.Include(e => e.Plan).Where(e => e.EmployeeId == eid).ToArrayAsync();
+                var att = atts.Where(e => (e.Plan.TimeStart - now) > TimeSpan.Zero && (e.Plan.TimeStart - now) < ts).ToArray();
+                if (att.Length > 0)
+                    att.First().Attendance = true;
+                else
+                    return BadRequest("ERR");
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return BadRequest("ERR");
+            }
+            return Ok(employee.Name);
         }
     }
 }
