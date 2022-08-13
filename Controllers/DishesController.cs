@@ -399,7 +399,7 @@ namespace youAreWhatYouEat.Controllers
                     ditem.dish_name = item.Dish.DishName;
                     ditem.dish_order_id = item.DishOrderId;
                     //ditem.remark = getredis(item.DishOrderId + ":remark");
-                    ditem.remark = item.remark;
+                    ditem.remark = item.Remark;
                     dishOrderListItem.dish.Add(ditem);
                 }
                 ret.Add(dishOrderListItem);

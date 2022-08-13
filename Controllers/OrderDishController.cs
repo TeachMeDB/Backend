@@ -464,7 +464,7 @@ namespace youAreWhatYouEat.Controllers
                     dish_order.DishOrderId = dish_order_id;
                     var td = await _context.Dishes.FindAsync(dish_order.DishId);
                     dish_order.FinalPayment = p.dishes_info[t].dish_price_to_pay;
-                    dish_order.remark = p.dishes_info[t].remark;
+                    dish_order.Remark = p.dishes_info[t].remark;
                     //putredis(dish_order.DishOrderId + ":remark", p.dishes_info[t].remark);
 
                     try

@@ -351,7 +351,7 @@ namespace youAreWhatYouEat.Models
                     .IsUnicode(false)
                     .HasColumnName("ORDER_ID");
 
-                entity.Property(e => e.remark)
+                entity.Property(e => e.Remark)
                     .HasMaxLength(150)
                     .IsUnicode(false)
                     .HasColumnName("REMARK");
@@ -571,10 +571,6 @@ namespace youAreWhatYouEat.Models
                     .HasColumnType("NUMBER(38)")
                     .HasColumnName("EMPLOYEE_ID");
 
-                entity.Property(e => e.Repair)
-                    .HasColumnType("NUMBER(38)")
-                    .HasColumnName("REPAIR");
-
                 entity.HasOne(d => d.Assets)
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.AssetsId)
@@ -584,11 +580,6 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Manages)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("SYS_C0011106");
-
-                entity.HasOne(d => d.RepairNavigation)
-                    .WithMany(p => p.Manages)
-                    .HasForeignKey(d => d.Repair)
-                    .HasConstraintName("FK_REPAIR");
             });
 
             modelBuilder.Entity<OrderNumber>(entity =>
@@ -816,11 +807,15 @@ namespace youAreWhatYouEat.Models
 
             modelBuilder.Entity<Repair>(entity =>
             {
+                entity.HasKey(e => new { e.Assetsid, e.Latitude, e.Longitude })
+                    .HasName("SYS_C0011402");
+
                 entity.ToTable("REPAIR");
 
-                entity.Property(e => e.RepairId)
-                    .HasColumnType("NUMBER(38)")
-                    .HasColumnName("REPAIR_ID");
+                entity.Property(e => e.Assetsid)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("ASSETSID");
 
                 entity.Property(e => e.Latitude)
                     .HasMaxLength(30)
@@ -841,6 +836,12 @@ namespace youAreWhatYouEat.Models
                     .HasMaxLength(30)
                     .IsUnicode(false)
                     .HasColumnName("PHONE");
+
+                entity.HasOne(d => d.Assets)
+                    .WithMany(p => p.Repairs)
+                    .HasForeignKey(d => d.Assetsid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("SYS_C0011403");
             });
 
             modelBuilder.Entity<Salary>(entity =>
