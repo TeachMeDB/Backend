@@ -50,7 +50,7 @@ namespace youAreWhatYouEat.Controllers
                 var assets = await _context.Assets
                     .Include(a => a.Employee)
                     .Include(a => a.Manages)
-                        .ThenInclude(m => m.RepairNavigation)
+                    .Include(a => a.Repairs)
                     .FirstOrDefaultAsync(a =>a.AssetsType == assets_type);
                 if (assets == null) return NoContent();
 
@@ -62,13 +62,13 @@ namespace youAreWhatYouEat.Controllers
                 info.assets_status = (assets.AssetsStatus == 0) ? "正常" : "已坏";
                 info.employee_name = assets.Employee.Name;
 
-                foreach (var item in assets.Manages)
+                foreach (var item in assets.Repairs)
                 {
                     RepairInfo repair = new RepairInfo();
-                    repair.name = item.RepairNavigation.Name;
-                    repair.phone = item.RepairNavigation.Phone;
-                    repair.longitude = item.RepairNavigation.Longitude;
-                    repair.latitude = item.RepairNavigation.Latitude;
+                    repair.name = item.Name;
+                    repair.phone = item.Phone;
+                    repair.longitude = item.Longitude;
+                    repair.latitude = item.Latitude;
                     info.repair.Add(repair);
                 }
                 msg.data.Add(info);
@@ -78,7 +78,7 @@ namespace youAreWhatYouEat.Controllers
                 var assets = await _context.Assets
                     .Include(a => a.Employee)
                     .Include(a => a.Manages)
-                        .ThenInclude(m => m.RepairNavigation)
+                    .Include(a => a.Repairs)
                     .ToListAsync();
 
                 foreach (var asset in assets)
@@ -90,13 +90,13 @@ namespace youAreWhatYouEat.Controllers
                     info.assets_status = (asset.AssetsStatus == 0) ? "正常" : "已坏";
                     info.employee_name = asset.Employee.Name;
 
-                    foreach (var item in asset.Manages)
+                    foreach (var item in asset.Repairs)
                     {
                         RepairInfo repair = new RepairInfo();
-                        repair.name = item.RepairNavigation.Name;
-                        repair.phone = item.RepairNavigation.Phone;
-                        repair.longitude = item.RepairNavigation.Longitude;
-                        repair.latitude = item.RepairNavigation.Latitude;
+                        repair.name = item.Name;
+                        repair.phone = item.Phone;
+                        repair.longitude = item.Longitude;
+                        repair.latitude = item.Latitude;
                         info.repair.Add(repair);
                     }
                     msg.data.Add(info);
@@ -297,8 +297,39 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
-        // DELETE 删除资产
-        [HttpDelete("DeleteAsset")]
+        public class PostAddRepair
+        {
+            public string? assetsId { get; set; }
+            public string? name { get; set; }
+            public string? phone { get; set; }
+            public string? longitude { get; set; }
+            public string? latitude { get; set; }
+        }
+
+        // POST 添加资产维修点
+        [HttpPost("PostAddAssetRepair")]
+        public async Task<ActionResult> PostAddAssetRepair(PostAddRepair p)
+        {
+            Repair repair = new Repair();
+            repair.Assetsid = p.assetsId;
+            repair.Name = p.name;
+            repair.Phone = p.phone;
+            repair.Longitude = p.longitude;
+            repair.Latitude = p.latitude;
+
+            try
+            {
+                _context.Repairs.Add(repair);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+            // DELETE 删除资产
+            [HttpDelete("DeleteAsset")]
         public async Task<ActionResult> DeleteAsset(string id)
         {
             if (id == null) return BadRequest();

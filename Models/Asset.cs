@@ -8,6 +8,7 @@ namespace youAreWhatYouEat.Models
         public Asset()
         {
             Manages = new HashSet<Manage>();
+            Repairs = new HashSet<Repair>();
         }
 
         public string AssetsId { get; set; } = null!;
@@ -17,5 +18,6 @@ namespace youAreWhatYouEat.Models
 
         public virtual Employee Employee { get; set; } = null!;
         public virtual ICollection<Manage> Manages { get; set; }
+        public virtual ICollection<Repair> Repairs { get; set; }
     }
 }

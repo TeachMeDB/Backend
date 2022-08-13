@@ -5,17 +5,12 @@ namespace youAreWhatYouEat.Models
 {
     public partial class Repair
     {
-        public Repair()
-        {
-            Manages = new HashSet<Manage>();
-        }
-
-        public decimal RepairId { get; set; }
+        public string Assetsid { get; set; } = null!;
         public string? Name { get; set; }
         public string? Phone { get; set; }
-        public string? Longitude { get; set; }
-        public string? Latitude { get; set; }
+        public string Longitude { get; set; } = null!;
+        public string Latitude { get; set; } = null!;
 
-        public virtual ICollection<Manage> Manages { get; set; }
+        public virtual Asset Assets { get; set; } = null!;
     }
 }

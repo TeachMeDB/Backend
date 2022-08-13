@@ -10,7 +10,7 @@ namespace youAreWhatYouEat.Models
         public decimal DishId { get; set; }
         public decimal FinalPayment { get; set; }
         public string DishStatus { get; set; } = null!;
-        public string? remark { get; set; }
+        public string? Remark { get; set; }
 
         public virtual Dish Dish { get; set; } = null!;
         public virtual Orderlist Order { get; set; } = null!;
