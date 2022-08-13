@@ -56,6 +56,9 @@ namespace youAreWhatYouEat.Controllers
             public string? dis_name { get; set; }
             public decimal price { get; set; }
             public string? description { get; set; } = string.Empty;
+            public string? video { get; set; } = string.Empty;
+            public string? picture { get; set; } = string.Empty;
+            public string? rate { get; set; } = string.Empty;
             public List<string>? tags { get; set; } = new List<string>();
         }
 
@@ -88,6 +91,15 @@ namespace youAreWhatYouEat.Controllers
                 dishesItem.dis_name = item.DishName;
                 dishesItem.price = item.DishPrice;
                 dishesItem.description = item.DishDescription;
+                dishesItem.picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + item.DishId.ToString() + ".png";
+                dishesItem.video = item.Video;
+                var rates = await _context.CommentOnDishes
+                    .Where(d => d.DishId == item.DishId)
+                    .ToListAsync();
+                decimal avg = 5.0M;
+                if (rates.Select(d => d.Stars).Average() != null)
+                    avg = (decimal)rates.Select(d => d.Stars).Average();
+                dishesItem.rate = Decimal.Round(avg, 2).ToString();
                 foreach (var t in item.Dtags)
                 {
                     dishesItem.tags.Add(t.DtagName);
@@ -114,6 +126,15 @@ namespace youAreWhatYouEat.Controllers
                 ret.dis_name = item.DishName;
                 ret.price = item.DishPrice;
                 ret.description = item.DishDescription;
+                ret.picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + item.DishId.ToString() + ".png";
+                ret.video = item.Video;
+                var rates = await _context.CommentOnDishes
+                    .Where(d => d.DishId == item.DishId)
+                    .ToListAsync();
+                decimal avg = 5.0M;
+                if (rates.Select(d => d.Stars).Average() != null)
+                    avg = (decimal)rates.Select(d => d.Stars).Average();
+                ret.rate = Decimal.Round(avg, 2).ToString();
                 foreach (var t in item.Dtags)
                 {
                     ret.tags.Add(t.DtagName);
@@ -160,9 +181,15 @@ namespace youAreWhatYouEat.Controllers
                 .FirstOrDefaultAsync(d => d.DishId == dish.id);
 
             dm.DishDescription = dish.description;
-            putredis(dm.DishId + ":video", dish.video);
+            dm.Video = dish.video;
             dm.DishName = dish.dis_name;
             dm.DishPrice = dish.price;
+            if (dish.picture != null)
+            {
+                byte[] base64 = Convert.FromBase64String(dish.picture);
+                string path = "/images/dishes/dish_" + dish.id.ToString() + ".png";
+                System.IO.File.WriteAllBytes(path, base64);
+            }
             dm.Dtags.Clear();
 
             foreach (var tag in dish.tags)
