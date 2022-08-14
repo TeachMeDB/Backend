@@ -60,6 +60,7 @@ namespace youAreWhatYouEat.Controllers
             public string? picture { get; set; } = string.Empty;
             public string? rate { get; set; } = string.Empty;
             public List<string>? tags { get; set; } = new List<string>();
+            public List<string>? ingredient { get; set; } = new List<string>();
         }
 
         public class PostDishesItem
@@ -71,6 +72,7 @@ namespace youAreWhatYouEat.Controllers
             public List<string>? tags { get; set; } = new List<string>();
             public string? picture { get; set; }
             public string? video { get; set; }
+            public List<string>? ingredient { get; set; } = new List<string>();
         }
 
 
@@ -84,7 +86,7 @@ namespace youAreWhatYouEat.Controllers
             }
             List<GetDishesItem> ret = new List<GetDishesItem>();
 
-            await foreach (var item in _context.Dishes.Include(e => e.Dtags).AsAsyncEnumerable())
+            await foreach (var item in _context.Dishes.Include(e => e.Dtags).Include(e => e.Ingrs).AsAsyncEnumerable())
             {
                 var dishesItem = new GetDishesItem();
                 dishesItem.id = item.DishId;
@@ -103,6 +105,10 @@ namespace youAreWhatYouEat.Controllers
                 foreach (var t in item.Dtags)
                 {
                     dishesItem.tags.Add(t.DtagName);
+                }
+                foreach (var i in item.Ingrs)
+                {
+                    dishesItem.ingredient.Add(i.IngrName);
                 }
                 ret.Add(dishesItem);
             }
@@ -214,6 +220,28 @@ namespace youAreWhatYouEat.Controllers
                     continue;
                 }
             }
+            foreach (var ing in dish.ingredient)
+            {
+                try
+                {
+                    bool dingr = false;
+                    foreach (var item in dm.Ingrs)
+                    {
+                        if (ing == item.IngrName)
+                        {
+                            dingr = true;
+                            break;
+                        }
+                    }
+
+                    if (!dingr)
+                        dm.Ingrs.Add(_context.Ingredients.Where(e => e.IngrName == ing).First());
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+            }
             try
             {
                 await _context.SaveChangesAsync();
@@ -251,6 +279,17 @@ namespace youAreWhatYouEat.Controllers
                 try
                 {
                     dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+            }
+            foreach (var ing in dish.ingredient)
+            {
+                try
+                {
+                    dm.Ingrs.Add(_context.Ingredients.Where(e => e.IngrName == ing).First());
                 }
                 catch (Exception ex)
                 {
