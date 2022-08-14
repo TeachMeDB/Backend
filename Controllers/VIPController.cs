@@ -150,29 +150,29 @@ namespace youAreWhatYouEat.Controllers
 
         public class PostAddVIPInfo
         {
-            public string? user_name { get; set; }
+            public string phone_number { get; set; } = String.Empty;
             public string? gender { get; set; }
             public string? birthday { get; set; }
         }
 
         // POST 添加VIP
-        //[HttpPost("PostAddVIP")]
-        //public async Task<ActionResult> PostAddVIP(PostAddVIPInfo p)
-        //{
-        //    Vip vip = new Vip();
-        //    vip.UserName = p.user_name;
-        //    vip.Gender = p.gender;
-        //    vip.Birthday = Convert.ToDateTime(p.birthday);
-
-        //    try
-        //    {
-        //        _context.Vips.Add(vip);
-        //        await _context.SaveChangesAsync();
-        //        return Ok();
-        //    } catch (Exception ex)
-        //    {
-        //        return BadRequest(ex);
-        //    }
-        //}
+        [HttpPost("PostAddVIP")]
+        public async Task<ActionResult> PostAddVIP(PostAddVIPInfo p)
+        {
+            Vip vip = new Vip();
+            vip.UserName = p.phone_number;
+            vip.Gender = p.gender;
+            vip.Birthday = Convert.ToDateTime(p.birthday);
+            vip.Credit = 0;
+            try
+            {
+                _context.Vips.Add(vip);
+                await _context.SaveChangesAsync();
+                return Ok();
+            } catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
