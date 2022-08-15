@@ -192,25 +192,25 @@ namespace youAreWhatYouEat.Controllers
             return Ok(info);
         }
 
-        public class StatusInfo
+        public class StatusInfo2
         {
             public string? order_status { get; set; }
         }
 
-        /*        // GET 获取订单支付状态
-                [HttpGet("GetOrderStatus")]
-                public async Task<ActionResult<StatusInfo>> GetOrderStatus(string? order_id)
-                {
-                    if (order_id == null) return BadRequest();
-                    var order = await _context.Orderlists
-                        .FirstOrDefaultAsync(o => o.OrderId == order_id);
-                    if (order == null) return NoContent();
+        // GET 获取订单支付状态
+        [HttpGet("GetOrderStatus")]
+        public async Task<ActionResult<StatusInfo2>> GetOrderStatus(string? order_id)
+        {
+            if (order_id == null) return BadRequest();
+            var order = await _context.Orderlists
+                .FirstOrDefaultAsync(o => o.OrderId == order_id);
+            if (order == null) return NoContent();
 
-                    StatusInfo info = new StatusInfo();
-                    info.order_status = order.OrderStatus;
+            StatusInfo2 info = new StatusInfo2();
+            info.order_status = order.OrderStatus;
 
-                    return Ok(info);
-                }*/
+            return Ok(info);
+        }
 
         public class PromotionDish2
         {
