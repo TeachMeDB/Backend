@@ -467,6 +467,25 @@ namespace youAreWhatYouEat.Controllers
                     dish_order.Remark = p.dishes_info[t].remark;
                     //putredis(dish_order.DishOrderId + ":remark", p.dishes_info[t].remark);
 
+                    var ttd = await _context.Dishes.Include(e => e.Ingrs).Where(e => e.DishId == td.DishId).FirstAsync();
+                    foreach (var i in ttd.Ingrs.AsEnumerable())
+                    {
+                        IngredientRecord info = new IngredientRecord();
+                        info.Ingr = i;
+                        info.Surplus = -1;
+                        info.RecordId = _context.IngredientRecords.Max(e => e.RecordId) + 1;
+                        info.PurchasingDate = DateTime.Now;
+                        try
+                        {
+                            _context.IngredientRecords.Add(info);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            return BadRequest(ex);
+                        }
+                    }
+
                     try
                     {
                         _context.Dishorderlists.Add(dish_order);
