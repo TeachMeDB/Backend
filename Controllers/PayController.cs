@@ -101,47 +101,44 @@ namespace youAreWhatYouEat.Controllers
             return ret;
         }
 
+        public class FinalPayReq
+        {
+            public decimal final_price { get; set; } = 0.1M;
+            public List<string> order_ids { get; set; } = new List<string>();
+        }
+
         public class FinalPayRes
         {
             public string qrcode { get; set; } = String.Empty;
         }
-
-        [HttpGet("FinalPay")]
-        public async Task<ActionResult<FinalPayRes>> FinalPay(string order_id)
+        [HttpPost("FinalPay")]
+        public async Task<ActionResult<FinalPayRes>> FinalPay(FinalPayReq f)
         {
             FinalPayRes ret = new FinalPayRes();
             // long timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            var orders = f.order_ids.ToHashSet();
             var order = await _context.Orderlists
             .Include(o => o.Dishorderlists)
-            .FirstOrDefaultAsync(o => o.OrderId == order_id);
-            if (order == null)
+            .Where(o => orders.Contains(o.OrderId)).ToListAsync();
+            if (order.Count() != orders.Count)
             {
                 return NoContent();
             }
-            if (order.OrderStatus == "已支付")
+            foreach (var o in order)
             {
-                return NoContent();
+                if (o.OrderStatus == "已支付")
+                {
+                    return NoContent();
+                }
             }
-            decimal price = 0;
-            foreach (var item in order.Dishorderlists)
-            {
-                price += item.FinalPayment;
-            }
+            decimal price = f.final_price;
             Factory.SetOptions(GetConfig());
-            string oid = order.CreationTime.ToString("yyyyMMddHHmmss");
+            string oid = order.Max(e => e.CreationTime).ToString("yyyyMMddHHmmss");
             string? payid = getredis(oid);
             try
             {
                 if (payid != null)
                 {
-/*                    if (getredis("status:" + payid) == "Waiting")
-                    {
-                        ret.qrcode = getredis("qr:" + oid);
-                    }
-                    else
-                    {
-                        return NotFound();
-                    }*/
                     ret.qrcode = getredis("qr:" + oid);
                 }
                 else
@@ -155,6 +152,11 @@ namespace youAreWhatYouEat.Controllers
                         putredis("qr:" + oid, response.QrCode);
                         putredis("status:" + response.OutTradeNo, "Waiting");
                         // await _context.SaveChangesAsync();
+                        var ol = _context.Orderlists.Include(o => o.Dishorderlists).Where(o => orders.Contains(o.OrderId));
+                        foreach(var o in ol)
+                        {
+                            putredis("dishoid:" + o.OrderId, oid);
+                        }
                     }
                     else
                     {
@@ -172,6 +174,72 @@ namespace youAreWhatYouEat.Controllers
             return Ok(ret);
         }
 
+
+        /*        public async Task<ActionResult<FinalPayRes>> FinalPayOld(string order_id)
+                {
+                    FinalPayRes ret = new FinalPayRes();
+                    // long timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+                    var order = await _context.Orderlists
+                    .Include(o => o.Dishorderlists)
+                    .FirstOrDefaultAsync(o => o.OrderId == order_id);
+                    if (order == null)
+                    {
+                        return NoContent();
+                    }
+                    if (order.OrderStatus == "已支付")
+                    {
+                        return NoContent();
+                    }
+                    decimal price = 0;
+                    foreach (var item in order.Dishorderlists)
+                    {
+                        price += item.FinalPayment;
+                    }
+                    Factory.SetOptions(GetConfig());
+                    string oid = order.CreationTime.ToString("yyyyMMddHHmmss");
+                    string? payid = getredis(oid);
+                    try
+                    {
+                        if (payid != null)
+                        {
+        *//*                    if (getredis("status:" + payid) == "Waiting")
+                            {
+                                ret.qrcode = getredis("qr:" + oid);
+                            }
+                            else
+                            {
+                                return NotFound();
+                            }*//*
+                            ret.qrcode = getredis("qr:" + oid);
+                        }
+                        else
+                        {
+                            AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace().PreCreate("菜品结算", oid, price.ToString());
+                            if (ResponseChecker.Success(response))
+                            {
+                                // Console.WriteLine("调用成功");
+                                ret.qrcode = response.QrCode;
+                                putredis(oid, response.OutTradeNo);
+                                putredis("qr:" + oid, response.QrCode);
+                                putredis("status:" + response.OutTradeNo, "Waiting");
+                                // await _context.SaveChangesAsync();
+                            }
+                            else
+                            {
+                                Console.WriteLine("调用失败，原因：" + response.Msg + "，" + response.SubMsg);
+                                return NotFound();
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Console.WriteLine("调用遭遇异常，原因：" + ex.Message);
+                        // throw ex;
+                        return StatusCode(500);
+                    }
+                    return Ok(ret);
+                }*/
+
         public class StatusInfo
         {
             public string order_status { get; set; } = String.Empty;
@@ -187,7 +255,11 @@ namespace youAreWhatYouEat.Controllers
             if (order == null) return NoContent();
             StatusInfo info = new StatusInfo();
 
-            string oid = order.CreationTime.ToString("yyyyMMddHHmmss");
+            string oid = getredis("dishoid:" + order.OrderId);
+            if (oid != null)
+            {
+                return Ok(order.OrderStatus);
+            }
             string? payid = getredis(oid);
 
             if (payid == null)
