@@ -56,44 +56,41 @@ namespace youAreWhatYouEat.Controllers
         }
 
         // GET 获取订单的菜品信息
-        [HttpPost("GetOrderDishInfo")]
-        public async Task<ActionResult<OrderDishInfo2>> GetOrderDishInfo(ListOrderId? order_id)
+        [HttpGet("GetOrderDishInfo")]
+        public async Task<ActionResult<OrderDishInfo2>> GetOrderDishInfo(string order_id)
         {
             if (order_id == null) return BadRequest();
             OrderDishInfo2 orderDishInfo = new OrderDishInfo2();
 
-            foreach (var id in order_id.order_id)
+            var orderdish = await _context.Orderlists
+                .Include(o => o.Dishorderlists)
+                    .ThenInclude(d => d.Dish)
+                .FirstOrDefaultAsync(o => o.OrderId == order_id);
+            if (orderdish == null) return NoContent();
+
+            foreach (var dish in orderdish.Dishorderlists)
             {
-                var orderdish = await _context.Orderlists
-                    .Include(o => o.Dishorderlists)
-                        .ThenInclude(d => d.Dish)
-                    .FirstOrDefaultAsync(o => o.OrderId == id);
-                if (orderdish == null) return NoContent();
-
-                foreach (var dish in orderdish.Dishorderlists)
+                bool tag = false;
+                for (int i = 0; i < orderDishInfo.dish_info.Count; i++)
                 {
-                    bool tag = false;
-                    for (int i = 0; i < orderDishInfo.dish_info.Count; i++)
+                    if (orderDishInfo.dish_info[i].dish_name == dish.Dish.DishName && orderDishInfo.dish_info[i].dish_status == dish.DishStatus)
                     {
-                        if (orderDishInfo.dish_info[i].dish_name == dish.Dish.DishName && orderDishInfo.dish_info[i].dish_status == dish.DishStatus)
-                        {
-                            orderDishInfo.dish_info[i].dish_num++;
-                            tag = true;
-                            break;
-                        }
+                        orderDishInfo.dish_info[i].dish_num++;
+                        tag = true;
+                        break;
                     }
-                    if (tag) continue;
-
-                    DishInfo dishInfo = new DishInfo();
-                    dishInfo.dish_name = dish.Dish.DishName;
-                    dishInfo.dish_price = dish.FinalPayment;
-                    dishInfo.dish_status = dish.DishStatus;
-                    dishInfo.dish_num = 1;
-                    dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
-                    dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
-                    dishInfo.dish_id = Convert.ToInt32(dish.DishId);
-                    orderDishInfo.dish_info.Add(dishInfo);
                 }
+                if (tag) continue;
+
+                DishInfo dishInfo = new DishInfo();
+                dishInfo.dish_name = dish.Dish.DishName;
+                dishInfo.dish_price = dish.FinalPayment;
+                dishInfo.dish_status = dish.DishStatus;
+                dishInfo.dish_num = 1;
+                dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
+                dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
+                dishInfo.dish_id = Convert.ToInt32(dish.DishId);
+                orderDishInfo.dish_info.Add(dishInfo);
             }
             return Ok(orderDishInfo);
         }
@@ -627,6 +624,61 @@ namespace youAreWhatYouEat.Controllers
             {
                 return BadRequest(ex);
             }
+        }
+
+        public class PostAddDishReq
+        {
+            public List<OrderInfo3> dishes_info { get; set; }
+            public decimal table_id { get; set; }
+            public string order_id { get; set; }
+        }
+        [HttpPost("AddDish")]
+        public async Task<ActionResult> AddDish(PostAddDishReq q)
+        {
+            Random random = new Random();
+            var order = await _context.Orderlists.Include(e => e.Dishorderlists).Where(e => e.OrderId == q.order_id).FirstAsync();
+            if (order == null) return BadRequest();
+            try
+            {
+                foreach (var item in q.dishes_info)
+                {
+                    for (int j = 0; j < item.dish_num; j++)
+                    {
+                        string dish_order_id = "";
+                        var dish_orders = new List<string>();
+                        do
+                        {
+                            dish_orders = await _context.Dishorderlists
+                                .Select(d => d.DishOrderId)
+                                .ToListAsync();
+
+                            dish_order_id = "";
+                            for (int i = 0; i < 11; i++)
+                            {
+                                int r = random.Next(0, 62);
+                                if (r < 10) dish_order_id += r.ToString();
+                                else if (r < 36) dish_order_id += (char)(97 + r - 10);
+                                else dish_order_id += (char)(65 + r - 36);
+                            }
+                        } while (dish_orders.IndexOf(dish_order_id) != -1);
+                        Dishorderlist dishorderlist = new Dishorderlist();
+                        dishorderlist.DishOrderId = dish_order_id;
+                        dishorderlist.OrderId = order.OrderId;
+                        dishorderlist.DishId = item.dish_id;
+                        dishorderlist.Dish = _context.Dishes.Find((decimal)item.dish_id);
+                        dishorderlist.Remark = item.remark;
+                        dishorderlist.DishStatus = "待处理";
+                        dishorderlist.FinalPayment = item.dish_price_to_pay;
+                        _context.Dishorderlists.Add(dishorderlist);
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
         }
     }
 }
