@@ -164,6 +164,7 @@ namespace youAreWhatYouEat.Controllers
             vip.Gender = p.gender;
             vip.Birthday = Convert.ToDateTime(p.birthday);
             vip.Credit = 0;
+            vip.Password = '233';
             try
             {
                 _context.Vips.Add(vip);
