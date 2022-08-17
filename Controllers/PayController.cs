@@ -39,9 +39,9 @@ namespace youAreWhatYouEat.Controllers
                 MerchantPrivateKey = "MIIEowIBAAKCAQEAiQZ+zt1BUt3HBwwonSgEcfu2lB6zJkRiSxW7Y7gFiv7vhwz0Rzdfla/FFhdUREGhVToUgc16GqkA1yjk0ofM4TTJMFbGf5ikHhhIZeBLfZnQ97L8L8o+FNu5kt6j5wdhd094ivvwvFfH47CAUTLZwJJ3/dJiEb/SOyHv2ccRo+1gQI8JZltG0KdDsphJy+K7jpDp9pTtZe8zs8mR+OPOGynEOgX49Pk9GaFYa9M3L3r2Ge3svDDP80f3aXixbaQFtUie6UAvt6nNGdh9ntHGrQRrt9LAxFCWeKHLK2bJtvv7ly0klEQ2hZcf4e7Gp5+SrMdz3/mWXYlywtrq96sj5wIDAQABAoIBADuwPKTX9JCoUv5a6YYr3GPahhnXlapht3+Fo+84RhHaI3Tsy6wKDvUhb/TDjM1+2UxK1IwGed4LKHaRNbwPs8uWNt17r1P9peAGK+NU5Q19Z22+5ePbcVecryWvHi6RJH/YemXwgVlJ06T3Sa4VPI2KQAKtFlMs/+MKUXTIJoMFTMlmUyRDoUWzB+kLbXR/UU0ifxFCW3CbKzLVWulwSAuvps5Lt3jrs1ZECA9NQslUwdLTI3MfGWrJffcOQqbRWW2suye06ds95GF8Q7USFin3xLgVRIu5I7vnbfDiRJEjgC1i3l34TiYeeb0vtbsi49SzpoYLCBsqUUOwnfyMRGECgYEAw4tlVPCTBcDlWbSZvKEnnCw9ylQMolxKTe5QFNKWO4q0oAdV86dh5/Fn93N6362Iba3KhDEqK0v4tGrpQ8rFDtQhHdM7j0XppW+33iilgsw2iWSFDJUediISHuhkBEOdikAcPwXC1t8EFqK/SMajnUEFvUF9O47ZTXg2h+ikBUMCgYEAs2OIN0nabRjmxfqFXLVAbt3cW663GK+yNPP+Arz2N5mJBs2xS9EPWXGeXb9xwSfY9zDfmEPWksYPOmF8cCMtA5YGPvBaxWNw4w1M8mE1hrz9PlTvin7GYSURpaiy4ImSTFCeOXKcYdpUDPry6wECkWKBzQ7i9TSbcfZeNhqX6o0CgYBmCNW+Ra4h4W6LqX5S/DBkAH3ZlpPlII0xLvogc2Yq+YyYuFs0QZIH6mKar2pdTvqSaI30/oaHgyPqWKMRWbwLqcsB+hfpAc0SI0JpLQJ4RsDqXkZCs4jqkYqtEAwoYXPSEPPsOsBZSJOkkBWKDwSO6L/q6kJDkp13HBQwRMdZawKBgBzUDfv0nmmR6uQ+EliHuEcY2GTTexE4iwb/fv6pp1fgEKlLPQbWHgVdwPmH3pwP70oqTISHwl/r/F6BdCIBRSaiYXaT4cJ+7JFQfeElxhhVHs15kNVM8kyCTIe2yKhU83HYMtVAmekP0RoU6hziGKuMjReLIOYPAjwaP6GqPGexAoGBAIv5Nzus7n5Da8DaDdbnh9MsNM4SuP9drC3Q4aMO+cRPXnEb2xcUtbhbx1CMJ15RJiXv5VSk1IToLLH82GsC9VypoFyw0b290E7YUWqU2cRRciV2N2TY940vC+i5Q4lnhFYoGk8LKE7QjOr1L4TVDAH+rANW8FEWjKyKVSTP1d1f",
 
 
-                MerchantCertPath = "appCertPublicKey_2021000121644403.crt",
-                AlipayCertPath = "alipayCertPublicKey_RSA2.crt",
-                AlipayRootCertPath = "alipayRootCert.crt",
+                MerchantCertPath = "Certificate/appCertPublicKey_2021000121644403.crt",
+                AlipayCertPath = "Certificate/alipayCertPublicKey_RSA2.crt",
+                AlipayRootCertPath = "Certificate/alipayRootCert.crt",
 
                 // 如果采用非证书模式，则无需赋值上面的三个证书路径，改为赋值如下的支付宝公钥字符串即可
                 // AlipayPublicKey = "<-- 请填写您的支付宝公钥，例如：MIIBIjANBg... -->"
