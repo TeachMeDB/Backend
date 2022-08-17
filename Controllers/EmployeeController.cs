@@ -132,10 +132,10 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetEmployeeInfo2")]
-        public async Task<ActionResult<List<EmployeeInfo3>>> GetEmployeeInfo2(string? token)
+        public async Task<ActionResult<List<EmployeeInfo3>>> GetEmployeeInfo2()
         {
-            var check = MyToken.checkToken(token);
-            if (!check.Result.active) return Forbid();
+            //var check = MyToken.checkToken(token);
+            //if (!check.Result.active) return Forbid();
 
             var info = await _context.Employees
                 .ToListAsync();
