@@ -162,7 +162,7 @@ namespace youAreWhatYouEat.Controllers
             {
                 // Console.WriteLine("调用遭遇异常，原因：" + ex.Message);
                 // throw ex;
-                return StatusCode(500);
+                return BadRequest(ex);
             }
             return Ok(ret);
         }
