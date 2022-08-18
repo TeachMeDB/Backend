@@ -680,5 +680,28 @@ namespace youAreWhatYouEat.Controllers
             }
             return Ok();
         }
+
+        public class UpdateCreditReq
+        {
+            public string user_name { get; set; } = String.Empty;
+            public decimal credit { get; set; } = 0;
+        }
+        [HttpPost("UpdateCredit")]
+        public async Task<ActionResult> UpdateCredit(UpdateCreditReq q)
+        {
+            Random random = new Random();
+            var user = await _context.Vips.FindAsync(q.user_name);
+            if (user == null) return BadRequest("No such user.");
+            try
+            {
+                user.Credit = q.credit;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+            return Ok();
+        }
     }
 }
