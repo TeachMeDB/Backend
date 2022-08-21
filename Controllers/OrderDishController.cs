@@ -153,7 +153,7 @@ namespace youAreWhatYouEat.Controllers
                     rate += Convert.ToInt32(cmt.Stars);
                     count++;
                 }
-                if (count == 0) rate = 0;
+                if (count == 0) rate = 5;
                 else rate = rate / count;
                 d.dish_rate = rate;
                 list.Add(d);
@@ -330,7 +330,7 @@ namespace youAreWhatYouEat.Controllers
                     rate += Convert.ToInt32(cmt.Stars);
                     count++;
                 }
-                if (count == 0) rate = 0;
+                if (count == 0) rate = 5;
                 else rate = rate / count;
                 info.dish_rate = rate;
 

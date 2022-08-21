@@ -79,6 +79,8 @@ namespace youAreWhatYouEat.Controllers
             public decimal? price { get; set; }
             public int? director_id { get; set; }
             public string? director_name { get; set; }
+            public decimal? surplus { get; set; }
+            public decimal? purchases { get; set; }
         }
 
         public class IngredientRecordMessage
@@ -102,14 +104,19 @@ namespace youAreWhatYouEat.Controllers
                 IngredientRecordInfo info = new IngredientRecordInfo();
                 info.record_id = Convert.ToInt32(record.RecordId);
                 info.ingr_id = Convert.ToInt32(record.IngrId);
-                info.purchasing_date = ((DateTime)record.PurchasingDate).ToString("yyyy-MM-dd");
+                if (record.PurchasingDate != null) info.purchasing_date = ((DateTime)record.PurchasingDate).ToString("yyyy-MM-dd");
                 info.measure_unit = record.MeasureUnit;
                 info.director_id = Convert.ToInt32(record.DirectorId);
                 info.shelf_life = Convert.ToInt32(record.ShelfLife);
-                info.produced_date = ((DateTime)record.ProducedDate).ToString("yyyy-MM-dd");
+                if (record.ProducedDate != null) info.produced_date = ((DateTime)record.ProducedDate).ToString("yyyy-MM-dd");
                 info.price = record.Price;
                 info.ingr_name = record.Ingr.IngrName;
-                info.director_name = record.Director.Name;
+                if (record.Director != null) info.director_name = record.Director.Name;
+                if (record.Purchases != null) info.purchases = record.Purchases;
+                else info.purchases = 0;
+                if(record.Surplus != null) info.surplus = record.Surplus;
+                else info.surplus = 0;
+
                 msg.data.Add(info);
             }
             msg.total = msg.data.Count;
@@ -181,6 +188,8 @@ namespace youAreWhatYouEat.Controllers
             public string? produced_date { get; set; }
             public decimal? price { get; set; }
             public int? director_id { get; set; }
+            public decimal? surplus { get; set; }
+            public decimal? purchases { get; set; }
         }
 
         // POST 添加原料采购记录
@@ -198,6 +207,8 @@ namespace youAreWhatYouEat.Controllers
             info.ShelfLife = p.shelf_life;
             info.Price = p.price;
             info.DirectorId = Convert.ToDecimal(p.director_id);
+            info.Surplus = p.surplus;
+            info.Purchases = p.purchases;
 
             try
             {
@@ -230,6 +241,9 @@ namespace youAreWhatYouEat.Controllers
                 info.ShelfLife = p.shelf_life;
                 info.Price = p.price;
                 info.DirectorId = Convert.ToDecimal(p.director_id);
+                info.Surplus = p.surplus;
+                info.Purchases = p.purchases;
+
                 await _context.SaveChangesAsync();
                 return Ok();
             }

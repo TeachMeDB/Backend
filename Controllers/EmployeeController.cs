@@ -115,7 +115,7 @@ namespace youAreWhatYouEat.Controllers
                     if (item.Attendance == true) participant++;
                 }
                 if (tot != 0) tem.Attendance_rate = participant / tot * 100;
-                else tem.Attendance_rate = 0;
+                else tem.Attendance_rate = 100;
                 tem.Award_times = employee.Prizes.Count;
 
                 info.Add(tem);
