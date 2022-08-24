@@ -388,6 +388,7 @@ namespace youAreWhatYouEat.Controllers
         {
             public List<OrderInfo3> dishes_info { get; set; }
             public decimal table_id { get; set; }
+            public string username { get; set; }
         }
 
         public class ReturnOrder
@@ -428,6 +429,33 @@ namespace youAreWhatYouEat.Controllers
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
+            OrderNumber orderNumber = new OrderNumber();
+            orderNumber.OrderDate = DateTime.Now.Date;
+            orderNumber.UserName = p.username;
+            orderNumber.OrderId = order_id;
+            var list = await _context.OrderNumbers
+                .Where(o => o.OrderDate == orderNumber.OrderDate)
+                .OrderByDescending(o => o.OrderNumber1)
+                .ToListAsync();
+
+            string order_number = "A";
+            Int32 tem;
+            if (list.Count > 0)
+                tem = Convert.ToInt32(list[0].OrderNumber1.Substring(1));
+            else
+                tem = 0;
+            order_number += (tem + 1).ToString();
+            orderNumber.OrderNumber1 = order_number;
+
+            try
+            {
+                _context.OrderNumbers.Add(orderNumber);
+                await _context.SaveChangesAsync();
+            }catch (Exception ex)
             {
                 return BadRequest(ex);
             }
