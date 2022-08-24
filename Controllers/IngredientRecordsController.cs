@@ -169,7 +169,7 @@ namespace youAreWhatYouEat.Controllers
             i.PurchasingDate = Convert.ToDateTime(irri.date);
             i.Purchases = irri.amount;
             var ing = await _context.Ingredients.FirstOrDefaultAsync(i => i.IngrName == irri.ing_name);
-            if (ing == null) return NoContent();
+            if (ing != null) return NoContent();
             i.IngrId = ing.IngrId;
             try
             {
