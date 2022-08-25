@@ -56,7 +56,7 @@ namespace youAreWhatYouEat.Controllers
         {
             var order = await _context.Orderlists
                 .Include(o => o.Dishorderlists)
-                .OrderBy(o => o.CreationTime)
+                .OrderByDescending(o => o.CreationTime)
                 .FirstOrDefaultAsync(o => o.TableId == table);
             if (order == null) return NoContent();
 
@@ -111,7 +111,7 @@ namespace youAreWhatYouEat.Controllers
         {
             var orders = await _context.Orderlists
                 .Include(o => o.Dishorderlists)
-                .OrderBy(o => o.CreationTime)
+                .OrderByDescending(o => o.CreationTime)
                 .ToListAsync();
             int order_count = 0;
             int awaiting_count = 0;
