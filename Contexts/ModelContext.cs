@@ -18,6 +18,7 @@ namespace youAreWhatYouEat.Models
 
         public virtual DbSet<Asset> Assets { get; set; } = null!;
         public virtual DbSet<Attend> Attends { get; set; } = null!;
+        public virtual DbSet<Audit> Audits { get; set; } = null!;
         public virtual DbSet<Award> Awards { get; set; } = null!;
         public virtual DbSet<CommentOnDish> CommentOnDishes { get; set; } = null!;
         public virtual DbSet<CommentOnService> CommentOnServices { get; set; } = null!;
@@ -117,6 +118,23 @@ namespace youAreWhatYouEat.Models
                     .WithMany(p => p.Attends)
                     .HasForeignKey(d => d.PlanId)
                     .HasConstraintName("SYS_C0011088");
+            });
+
+            modelBuilder.Entity<Audit>(entity =>
+            {
+                entity.HasKey(e => new { e.LogTime, e.Log })
+                    .HasName("SYS_C0011516");
+
+                entity.ToTable("AUDITS");
+
+                entity.Property(e => e.LogTime)
+                    .HasColumnType("DATE")
+                    .HasColumnName("LOG_TIME");
+
+                entity.Property(e => e.Log)
+                    .HasMaxLength(256)
+                    .IsUnicode(false)
+                    .HasColumnName("LOG");
             });
 
             modelBuilder.Entity<Award>(entity =>
@@ -248,6 +266,7 @@ namespace youAreWhatYouEat.Models
 
                 entity.Property(e => e.DishId)
                     .HasColumnType("NUMBER(38)")
+                    .ValueGeneratedOnAdd()
                     .HasColumnName("DISH_ID");
 
                 entity.Property(e => e.DishDescription)
@@ -390,6 +409,7 @@ namespace youAreWhatYouEat.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnType("NUMBER(38)")
+                    .ValueGeneratedOnAdd()
                     .HasColumnName("ID");
 
                 entity.Property(e => e.Birthday)
@@ -965,6 +985,7 @@ namespace youAreWhatYouEat.Models
                 entity.Property(e => e.UserName)
                     .HasMaxLength(50)
                     .IsUnicode(false)
+                    .ValueGeneratedOnAdd()
                     .HasColumnName("USER_NAME");
 
                 entity.Property(e => e.Balance)

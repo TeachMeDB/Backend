@@ -16,9 +16,9 @@ namespace youAreWhatYouEat.Models
         public string Password { get; set; } = null!;
         public DateTime? Birthday { get; set; }
         public string? Gender { get; set; }
-        public decimal Balance { get; set; }
-        public decimal Credit { get; set; }
-        public string IsDefault { get; set; } = null!;
+        public decimal? Balance { get; set; }
+        public decimal? Credit { get; set; }
+        public string? IsDefault { get; set; }
 
         public virtual ICollection<CommentOnDish> CommentOnDishes { get; set; }
         public virtual ICollection<CommentOnService> CommentOnServices { get; set; }
