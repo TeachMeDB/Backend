@@ -44,7 +44,7 @@ namespace youAreWhatYouEat.Controllers
         public class AttrOfVIP
         {
             public string? name { get; set; }
-            public List<decimal> data = new List<decimal>();
+            public List<decimal?> data = new List<decimal?>();
         }
 
         public class ListOfVIP
