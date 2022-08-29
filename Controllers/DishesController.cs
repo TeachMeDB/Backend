@@ -184,6 +184,7 @@ namespace youAreWhatYouEat.Controllers
 
             var dm = await _context.Dishes
                 .Include(d => d.Dtags)
+                .Include(d => d.Ingrs)
                 .FirstOrDefaultAsync(d => d.DishId == dish.id);
 
             dm.DishDescription = dish.description;
@@ -245,6 +246,7 @@ namespace youAreWhatYouEat.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                // SYS_C0011127
             }
             catch (DbUpdateConcurrencyException)
             {
