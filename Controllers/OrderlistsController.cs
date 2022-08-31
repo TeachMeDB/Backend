@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+#pragma warning disable CS8629
+#pragma warning disable CS8601
 namespace youAreWhatYouEat.Controllers
 {
     //public class UnixTimeUtil

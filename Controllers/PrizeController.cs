@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
+#pragma warning disable CS8618
+#pragma warning disable CS0168
 namespace youAreWhatYouEat.Controllers
 {
     [Route("api/[controller]")]

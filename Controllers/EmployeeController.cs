@@ -6,7 +6,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using youAreWhatYouEat.Authorization;
-
+#pragma warning disable CS8629
+#pragma warning disable CS8604
+#pragma warning disable CS8601
+#pragma warning disable CS8618
+#pragma warning disable CS0162
 namespace youAreWhatYouEat.Controllers
 {
     [Route("api/[controller]")]

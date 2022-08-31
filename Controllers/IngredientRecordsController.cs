@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
+#pragma warning disable CS8629
 
 namespace youAreWhatYouEat.Controllers
 {

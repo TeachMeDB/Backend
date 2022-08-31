@@ -11,7 +11,9 @@ using Alipay.EasySDK.Kernel;
 using Alipay.EasySDK.Kernel.Util;
 using Alipay.EasySDK.Payment.FaceToFace.Models;
 using StackExchange.Redis;
-
+#pragma warning disable CS8629
+#pragma warning disable CS8601
+#pragma warning disable CA2200
 namespace youAreWhatYouEat.Controllers
 {
     [Route("api/[controller]")]

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
-
+#pragma warning disable CS0219
 namespace youAreWhatYouEat.Controllers
 {
     [Route("api/[controller]")]

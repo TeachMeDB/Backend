@@ -1,7 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
-
+#pragma warning disable CS8629
+#pragma warning disable CS8604
+#pragma warning disable CS8601
+#pragma warning disable CS8618
+#pragma warning disable CS0162
+#pragma warning disable CS0168
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace youAreWhatYouEat.Controllers

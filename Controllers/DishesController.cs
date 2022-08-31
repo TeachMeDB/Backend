@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using youAreWhatYouEat.Models;
 using StackExchange.Redis;
-
+#pragma warning disable CS8629
+#pragma warning disable CS8601
 namespace youAreWhatYouEat.Controllers
 {
     [Route("api/[controller]")]
@@ -147,7 +148,7 @@ namespace youAreWhatYouEat.Controllers
                 }
                 return ret;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return NoContent();
             }
@@ -216,7 +217,7 @@ namespace youAreWhatYouEat.Controllers
                     if (!dtag)
                         dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
@@ -238,7 +239,7 @@ namespace youAreWhatYouEat.Controllers
                     if (!dingr)
                         dm.Ingrs.Add(_context.Ingredients.Where(e => e.IngrName == ing).First());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
@@ -282,7 +283,7 @@ namespace youAreWhatYouEat.Controllers
                 {
                     dm.Dtags.Add(_context.Dishtags.Where(e => e.DtagName == tag).First());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
@@ -293,7 +294,7 @@ namespace youAreWhatYouEat.Controllers
                 {
                     dm.Ingrs.Add(_context.Ingredients.Where(e => e.IngrName == ing).First());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
