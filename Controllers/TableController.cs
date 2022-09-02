@@ -123,8 +123,8 @@ namespace youAreWhatYouEat.Controllers
                 foreach(var order in table.Orderlists)
                 {
                     tot_cnt += Convert.ToInt32(table.TableCapacity);
-                    if (order.CreationTime.Year == DateTime.Now.Year && order.CreationTime.Month 
-                        == DateTime.Now.Month && order.CreationTime.Day == DateTime.Now.Day)
+                    if (order.CreationTime.Year == DateTime.Now.ToUniversalTime().AddHours(8).Year && order.CreationTime.Month 
+                        == DateTime.Now.ToUniversalTime().AddHours(8).Month && order.CreationTime.Day == DateTime.Now.ToUniversalTime().AddHours(8).Day)
                         today_cnt += Convert.ToInt32(table.TableCapacity);
                 }
             }
@@ -174,7 +174,7 @@ namespace youAreWhatYouEat.Controllers
 
             info.has_table = false;
             var orders = _context.OrderNumbers
-                .Where(o => o.OrderDate.Date == DateTime.Now.Date);
+                .Where(o => o.OrderDate.Date == DateTime.Now.ToUniversalTime().AddHours(8).Date);
             int num = 0;
             foreach(var order in orders)
             {

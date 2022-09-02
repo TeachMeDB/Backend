@@ -234,7 +234,7 @@ namespace youAreWhatYouEat.Controllers
             try
             {
                 /*Console.WriteLine(DateTime.Now.ToShortTimeString() + employee.Name);*/
-                DateTime now = DateTime.Now;
+                DateTime now = DateTime.Now.ToUniversalTime().AddHours(8);
                 TimeSpan ts = TimeSpan.FromMinutes(10);
                 var atts = await _context.Attends.Include(e => e.Plan).Where(e => e.EmployeeId == eid).ToArrayAsync();
                 var att = atts.Where(e => (e.Plan.TimeStart - now) > TimeSpan.Zero && (e.Plan.TimeStart - now) < ts).ToArray();

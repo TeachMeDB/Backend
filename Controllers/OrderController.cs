@@ -148,24 +148,24 @@ namespace youAreWhatYouEat.Controllers
                     awaiting_count++;
                     awaiting_credit += order_credit;
                     total_credit += order_credit;
-                    if (order.CreationTime.Date == DateTime.Now.Date) today_credit += order_credit;
+                    if (order.CreationTime.Date == DateTime.Now.ToUniversalTime().AddHours(8).Date) today_credit += order_credit;
                 } else if (order.OrderStatus == "制作中")
                 {
                     processing_count++;
                     processing_credit += order_credit;
                     total_credit += order_credit;
-                    if (order.CreationTime.Date == DateTime.Now.Date) today_credit += order_credit;
+                    if (order.CreationTime.Date == DateTime.Now.ToUniversalTime().AddHours(8).Date) today_credit += order_credit;
                 } else if (order.OrderStatus == "已完成")
                 {
                     completed_count++;
                     completed_credit += order_credit;
                     total_credit += order_credit;
-                    if (order.CreationTime.Date == DateTime.Now.Date) today_credit += order_credit;
+                    if (order.CreationTime.Date == DateTime.Now.ToUniversalTime().AddHours(8).Date) today_credit += order_credit;
                 } else if (order.OrderStatus == "已支付") { 
                     payed_count++; 
                     payed_credit += order_credit;
                     total_credit += order_credit;
-                    if (order.CreationTime.Date == DateTime.Now.Date) today_credit += order_credit;
+                    if (order.CreationTime.Date == DateTime.Now.ToUniversalTime().AddHours(8).Date) today_credit += order_credit;
                 }
             }
             info.summary["order_count"] = order_count;

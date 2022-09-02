@@ -253,7 +253,7 @@ namespace youAreWhatYouEat.Controllers
             List<PromotionRecord2> ret = new List<PromotionRecord2>();
             await foreach (var p in _context.Promotions.Include(e => e.Hasdishes).ThenInclude(e => e.Dish).AsAsyncEnumerable())
             {
-                if (p.StartTime > DateTime.Now || p.EndTime < DateTime.Now) continue;
+                if (p.StartTime > DateTime.Now.ToUniversalTime().AddHours(8) || p.EndTime < DateTime.Now.ToUniversalTime().AddHours(8)) continue;
                 PromotionRecord2 pr = new PromotionRecord2();
                 pr.promotion_id = p.PromotionId;
                 pr.description = p.Description;
@@ -408,7 +408,7 @@ namespace youAreWhatYouEat.Controllers
 
             Orderlist order = new Orderlist();
             order.OrderStatus = "待处理";
-            order.CreationTime = DateTime.Now;
+            order.CreationTime = DateTime.Now.ToUniversalTime().AddHours(8);
 
             Random random = new Random();
             string order_id = "";
@@ -436,7 +436,7 @@ namespace youAreWhatYouEat.Controllers
             }
 
             OrderNumber orderNumber = new OrderNumber();
-            orderNumber.OrderDate = DateTime.Now.Date;
+            orderNumber.OrderDate = DateTime.Now.ToUniversalTime().AddHours(8);
             orderNumber.UserName = p.username;
             orderNumber.OrderId = order_id;
             var list = await _context.OrderNumbers
@@ -501,7 +501,7 @@ namespace youAreWhatYouEat.Controllers
                         info.Ingr = i;
                         info.Surplus = -1;
                         info.RecordId = _context.IngredientRecords.Max(e => e.RecordId) + 1;
-                        info.PurchasingDate = DateTime.Now;
+                        info.PurchasingDate = DateTime.Now.ToUniversalTime().AddHours(8);
                         try
                         {
                             _context.IngredientRecords.Add(info);
@@ -572,7 +572,7 @@ namespace youAreWhatYouEat.Controllers
             cmt.DishId = Convert.ToDecimal(p.dish_id);
             cmt.UserName = p.username;
             cmt.CommentContent = p.content;
-            cmt.CommentTime = DateTime.Now;
+            cmt.CommentTime = DateTime.Now.ToUniversalTime().AddHours(8);
 
             Random random = new Random();
             var cod = new List<string>();
@@ -622,7 +622,7 @@ namespace youAreWhatYouEat.Controllers
             cms.Stars = p.rate;
             cms.UserName = p.username;
             cms.CommentContent = p.content;
-            cms.CommentTime = DateTime.Now;
+            cms.CommentTime = DateTime.Now.ToUniversalTime().AddHours(8);
 
             Random random = new Random();
             var cos = new List<string>();
