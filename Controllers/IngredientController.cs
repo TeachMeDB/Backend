@@ -56,6 +56,7 @@ namespace youAreWhatYouEat.Controllers
             } else
             {
                 var ingrs = await _context.Ingredients
+                    .OrderBy(i => i.IngrId)
                     .ToListAsync();
                 
                 foreach(var ingr in ingrs)
@@ -101,6 +102,7 @@ namespace youAreWhatYouEat.Controllers
             var records = await _context.IngredientRecords
                 .Include(i => i.Ingr)
                 .Include(i => i.Director)
+                .OrderBy(i => i.RecordId)
                 .ToListAsync();
             IngredientRecordMessage msg = new IngredientRecordMessage();
 
