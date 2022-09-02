@@ -167,6 +167,7 @@ namespace youAreWhatYouEat.Controllers
             vip.Birthday = Convert.ToDateTime(p.birthday);
             vip.Credit = 0;
             vip.Password = "233";
+            vip.IsDefault = "否";
             try
             {
                 _context.Vips.Add(vip);
