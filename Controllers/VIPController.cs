@@ -99,6 +99,7 @@ namespace youAreWhatYouEat.Controllers
             AllVIPInfo allVIPInfo = new AllVIPInfo();
             foreach(var vip in vips)
             {
+                if (vip.UserName == "default") continue;
                 VIPInfo2 v = new VIPInfo2();
                 v.user_name = vip.UserName;
                 v.gender = vip.Gender;
