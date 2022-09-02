@@ -235,9 +235,10 @@ namespace youAreWhatYouEat.Controllers
             {
                 /*Console.WriteLine(DateTime.Now.ToShortTimeString() + employee.Name);*/
                 DateTime now = DateTime.Now.ToUniversalTime().AddHours(8);
-                TimeSpan ts = TimeSpan.FromMinutes(10);
+                TimeSpan ts = TimeSpan.FromMinutes(60);
                 var atts = await _context.Attends.Include(e => e.Plan).Where(e => e.EmployeeId == eid).ToArrayAsync();
-                var att = atts.Where(e => (e.Plan.TimeStart - now) > TimeSpan.Zero && (e.Plan.TimeStart - now) < ts).ToArray();
+                var att = atts.Where(e => (e.Plan.TimeStart - now) < ts && (now - e.Plan.TimeStart) < ts).ToArray();
+                // var att = atts.ToArray();
                 if (att.Length > 0)
                     att.First().Attendance = true;
                 else
