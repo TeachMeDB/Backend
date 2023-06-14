@@ -71,6 +71,67 @@ namespace youAreWhatYouEat.Controllers
             List<ScheduleInfo> infos = new List<ScheduleInfo>();
             foreach (WorkPlan schedule in scheduleInfo)
             {
+                if ((start_time == null || start_time >= schedule.TimeStart) && (end_time == null || end_time <=
+                    schedule.TimeEnd) && (place == null || schedule.Place == place) && (occupation == null ||
+                    schedule.Occupation == occupation))
+                {
+                    bool tag = true;
+                    if (id != null)
+                    {
+                        tag = false;
+                        foreach (Attend attend in schedule.Attends)
+                        {
+                            if (attend.Employee.Id.ToString() == id)
+                            {
+                                tag = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!tag) continue;
+
+                    ScheduleInfo info = new ScheduleInfo();
+                    info.plan_id = schedule.Id.ToString();
+                    info.time_start = ((DateTime)schedule.TimeStart).ToString("yyyy-MM-dd HH:mm:ss");
+                    info.time_end = ((DateTime)schedule.TimeEnd).ToString("yyyy-MM-dd HH:mm:ss");
+                    info.place = schedule.Place;
+                    info.occupation = schedule.Occupation;
+
+                    List<PeopleInfo> peoples = new List<PeopleInfo>();
+                    foreach (Attend attend in schedule.Attends)
+                    {
+                        PeopleInfo peop = new PeopleInfo();
+                        peop.id = attend.Employee.Id.ToString();
+                        peop.name = attend.Employee.Name;
+                        peop.gender = attend.Employee.Gender;
+                        peop.attendance = attend.Attendance;
+                        peoples.Add(peop);
+                    }
+                    info.peoples = peoples;
+                    infos.Add(info);
+                }
+            }
+
+            if (infos.Count == 0) return NoContent();
+            return Ok(infos);
+        }
+
+        // GET 获取指定排班信息
+        [HttpGet("GetSchedule")]
+        public async Task<ActionResult<List<ScheduleInfo>>> GetSchedule(string? start, string? end, string? id, string? place, string? occupation)
+        {
+            var scheduleInfo = await _context.WorkPlans
+                .Include(w => w.Attends)
+                    .ThenInclude(a => a.Employee)
+                .ToListAsync();
+
+            DateTime? start_time = null, end_time = null;
+            if (start != null) start_time = Convert.ToDateTime(start);
+            if (end != null) end_time = Convert.ToDateTime(end);
+
+            List<ScheduleInfo> infos = new List<ScheduleInfo>();
+            foreach (WorkPlan schedule in scheduleInfo)
+            {
                 if ((start_time == null || start_time <= schedule.TimeStart) && (end_time == null || end_time >=
                     schedule.TimeEnd) && (place == null || schedule.Place == place) && (occupation == null ||
                     schedule.Occupation == occupation))

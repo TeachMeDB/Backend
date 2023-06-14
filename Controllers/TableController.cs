@@ -210,6 +210,60 @@ namespace youAreWhatYouEat.Controllers
             }
         }
 
+        public class TableEmployeeInfo
+        {
+            public string? waiter_name { get; set; }
+            public string? waiter_id { get; set; }
+        }
+
+        // GET 获取员工信息
+        [HttpGet("WaiterByTable")]
+        public async Task<ActionResult<TableEmployeeInfo>> GetWaiterByTable(string table_id)
+        {
+            var table = await _context.Dinningtables
+                .FirstOrDefaultAsync(t => t.TableId.ToString() == table_id);
+            if (table == null) return NoContent();
+
+            string employee_id = table.EmployeeId.ToString();
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id.ToString() == employee_id);
+            if (employee == null) return NoContent();
+
+            string employee_name = employee.Name;
+            var info = new TableEmployeeInfo();
+            info.waiter_id = employee_id;
+            info.waiter_name = employee_name;
+
+            return Ok(info);
+        }
+
+        public class UpdateTableEmployeeInfo
+        {
+            public decimal table_id { get; set; }
+            public string waiter_name { get; set; }
+            public string waiter_id { get; set; }
+        }
+
+        // POST 修改员工信息
+        [HttpPost("WaiterByTable")]
+        public async Task<ActionResult> PostWaiterByTable(UpdateTableEmployeeInfo p)
+        {
+            var table = await _context.Dinningtables
+                .FirstOrDefaultAsync(t => t.TableId.ToString() == p.table_id.ToString());
+            if (table == null) return NoContent();
+
+            try
+            {
+                table.EmployeeId = Convert.ToDecimal(p.waiter_id);
+                await _context.SaveChangesAsync();
+            } catch (Exception e)
+            {
+                return BadRequest(e);
+            }
+
+            return Ok();
+        }
+
         // POST 修改桌子状态
         [HttpPost("PostTableStatus")]
         public async Task<ActionResult> PostTableStatus(TableInfo p)

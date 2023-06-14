@@ -14,6 +14,7 @@ namespace youAreWhatYouEat.Models
         public decimal? CustomerNumber { get; set; }
         public decimal? TableCapacity { get; set; }
         public string? Occupied { get; set; }
+        public decimal? EmployeeId { get; set; }
 
         public virtual ICollection<Orderlist> Orderlists { get; set; }
     }

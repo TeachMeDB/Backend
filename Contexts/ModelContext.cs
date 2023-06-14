@@ -258,6 +258,10 @@ namespace youAreWhatYouEat.Models
                 entity.Property(e => e.TableCapacity)
                     .HasColumnType("NUMBER(38)")
                     .HasColumnName("TABLE_CAPACITY");
+
+                entity.Property(e => e.EmployeeId)
+                    .HasColumnType("NUMBER(38)")
+                    .HasColumnName("EMPLOYEE_ID");
             });
 
             modelBuilder.Entity<Dish>(entity =>

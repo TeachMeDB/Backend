@@ -37,12 +37,12 @@ namespace youAreWhatYouEat.Controllers
                 SignType = "RSA2",
 
                 // 为避免私钥随源码泄露，推荐从文件中读取私钥字符串而不是写入源码中
-                AppId = "2021000121644403",
-                MerchantPrivateKey = "MIIEpQIBAAKCAQEAjc4TLUdCaSufVWOYmLCv+1fKIGGHE0Zt0CTAP0u8py8yQBBra2shz35L2uFRWvi/Sh4vwhs6YdnxeiltWKdGYxSE0alhwwjc3Oi+7HAm3l4+oxD3OZz7X77RpXSFQv0sUgwjpxqAlR9CvQVExNYtDDcpro/LTh2Txtd4pBM68AjJz8f2ea4lTfUXZkAP3tviSwNsMfO3zqkbzHu5tfb7L0hjshwfet0Y4obYG8GXCk6Yne0IVjTLT5hOPq+mMcTVZDGqUgXoQMavqUoqMcy09mEVOCc+ebW6PMdj5g4kCJ9LkFzLQxGtv5Pm/nhDmUM4s+H9UC1zjIxVenc1ceY7yQIDAQABAoIBAGDVdXD49Ve+KyrzPRQfq7zWITflgYjfEkQNpJ5UiLod15G55LDQ0qDPnNsV/ClELdReMry5PS/u1SBXw8zDRaSJMX2+zfySQ8gyw5XPrCszblCKWFimY13pf14d6JZrLmXE1l/ZEC9Ezp0nSOOlYdOyo6sJlIp+Vhh1sXNRknCwey53/QD2kIJSsR4SL8gc6cuuwhA0a2daL07olg9roimTpmMQj2j942lEKNhVmeACRKtKSkw/NzE6SZCp9x7qGwkZ7bSiAvXzPUehYvGGVxBfEN2k/8brXN8CcSAL3MPXF39jonRxxhopZX8m69LPArNWAZS9n2fo8RGbb7wlIIECgYEAxyUdJtMy/YRN3N+5Kp5LsIQfFBNhUOKT+k+L4HXV2vcTAoLzPlQTz8rwPKwVlte6LBrPu6PcrDh35lubBa4Wg/2mmu+Zv/vm95fBqyKxAi3SMAYfXFLVtw/62rJ7HSH9iRyOqEeZy9NYcWi5OOHQvrQVxeEI15PXnhXnybPj/JkCgYEAtkoox9S58b46imeqDCpkpvKnm4/TOImmc2+zZZYVjOXpbQVoWV2rtB+gtWRdtLzfY9wiQAARjDmj2nzPbJkFo3CSMcQRxITWRgSltOBAb7hulH1T5GUJXwvgfkXeLOn2PwyE2t2+jyryVr5l38mR6wY9jZVHbA4qnJKuFdrBBrECgYEAvtsB8kis8KzQ1qMPWhn1XklxY5MjTBqqSVXdL5SfDUiHzntj1dNMXXQYA33E/xjnEwfrGOD1R5SizIH0s1/hskPxXUHOL2GjPJ0Tfgk0bWsuqtnjSl8U9Wn6N4igVw5RZwuYaQyeB+sYMzBze2Fn5qy+xTNjfv/wwFAsIXInSNkCgYEAtTMIUIMzhop6dIPRM6CcRptkYizYYBXsIElDgVJr/4+2tckvTc3f1P+vZz/qKbOpNwFmBkpLJyFQr+lq4l9FjI5ktBVbOAZ3XEhYU3CqfKNPQElIL/sDEriiocJftDOotEmEcm8DchrVo8ZFS+t5Ia8lVmyx/0Yhs1vWsiCtyTECgYEAqcuctxSKg4HBp6C2typ3Au8nVVeW5xGATvV8puvIIG020wyP1F+oAC7Bzc2D79mfWUtAEt5X4na1CfUaT1xsrLcV/F6jXuGdZE0jOvO+Hd1z2Sf5k5wflXj3diQIBJEtuh2Y73KzpVe9aBrA6gO5f8J18EWwuY+m8VeXKpKNXOY=",
+                AppId = "2021000122686075",
+                MerchantPrivateKey = "MIIEowIBAAKCAQEAjHGG/8qKzn5nOeu/YO2ZeqN4VCUGoOElff4z8EYufoNHApuizJ9Ks4ikHu0YJIolPQDIo5NUcvtmm+EHVhlTH1vvhywIyTtKM65j7/VopcSEXasbDISXDm2854P4n5pwi/VpGWfLH9tFCi/0IndtVSYAuU7EuOqE1hQjzPvDZpL28eFT4dv6NjfDXF9ADO2Pg+E6Kf2/X95DxKhbA4vNthydaYIBD2vC7RhPUySuc5C6bYGB7jq/jhEPLPBi5Z8QxAwZ5YrScsVg6NHqWBvkweb3oKySctaa81YyJPk6M0hC5av/wNaGkpfUxcpmHYwhLUqopRNYDz3sjDWctqvdowIDAQABAoIBAHX5d7mvXmKPdA8Hpb+6V07Zut6UK7lA58mqm96eVbgYdrIOIvdYZ9vgUF1aNQmcsiNIYUJnJG1iGZOfuBXvOBADnnYh20+O6on3WCPeNoXpSneUoCgnyOxp6mFgTp1jkl8/S4X31n1wJ9Ki7aV2RPVd8wW20TG0btmWGWy7oCysz7fjOGwrLjA+C2ysxOAoYe3ORs8bJAwmzLxRxf/axAVO9tlvmSLKDQvy2WccnQCK6aBn7SpUPIXH0nP1aO5okJOHunf8+PjUhy8EoD5Zu5gorTmynpXFWMWZmamFJ9pkk21M9jS6lBOGYbn3fYw/Sk6C4cGkVFzxx2mkL9oeNkECgYEAz73SAuielbNpK5/mawJTKnzg084k5MzlOZx27mdIqbZtxL8kglCMk0R3sqBiiLgiGMF4rpL64+MeDrRaeq2/gvrqOag66d9dpdBxLN5m/sEwJNU4v1zi1zvM724/LIn8iRYzc2/QiCcOjMinBCkM3KLSjENDcgLvXl9NHWkhU3kCgYEArRGPh11U2wlhmENTTr2lhtVDOpqPKYSxYtSEExQCZHyXOQ1KV9c0hsZLuzZ1t44yJqHaTFfDvdw4eVa260UEVPqgiWUG6lDdKAW9sNTu8R39f85ypsI7MpTVxK4jh+zVI3jAy4z4MD3EcaJJiOMoURG+7A4n0HcoRhBIowYftvsCgYBiwZc7oL/65H5DqdEM398PXKw4pE/voOP7nkD/loP5geru0/sUJByfybWpagtNeVNkN10aiG7StN5OGTjGByD6sDN2012mXnQTZmLW9Kc7xjUP3XkLp6mCrj//Noa7sqElvjMZVndoskB9dsnG9YjSvmifGz7NzU1jrKRpLdgU6QKBgQCUfP2dUXltmMXwYstGQraTUcSlslhkceHT/qv2xnMrDi6dF4cSiKUbgWUWkio7u7fRp4ppd9+MtTaK/NhiUUvfMU2ttE1Tmt+06AARiRAdNfL6xgFejEVIJ6SlZBc+FvfjwEYCHsgOc+Bo8qmO1f8QV15sn9SPKr0WKAB6RtXNIwKBgAviOiLmYjQwpf7IO/IXUUIcVR/0y7ele5RbVQLy5zaCTw1qiY/X1XjVp5tWdwbrp2vdSOnbR+Petf8sQQLtrLydUh41Q6cLUmJfwBDYQ62rb5tWHQ8/gxkbwjkIsa22UGRVMzLTPHMrY+05avRckdk/Z5c9Mmj4fTzzdV6d+ibp",
 
 
-                MerchantCertPath = "Certificate/appCertPublicKey_2021000121644403.crt",
-                AlipayCertPath = "Certificate/alipayCertPublicKey_RSA2.crt",
+                MerchantCertPath = "Certificate/appPublicCert.crt",
+                AlipayCertPath = "Certificate/alipayPublicCert.crt",
                 AlipayRootCertPath = "Certificate/alipayRootCert.crt",
 
                 // 如果采用非证书模式，则无需赋值上面的三个证书路径，改为赋值如下的支付宝公钥字符串即可
@@ -146,6 +146,8 @@ namespace youAreWhatYouEat.Controllers
                     AlipayTradePrecreateResponse response = Factory.Payment.FaceToFace().PreCreate("菜品结算", oid, price.ToString());
                     if (ResponseChecker.Success(response))
                     {
+			Factory.Payment.Common().Create("菜品结算", oid, price.ToString(), "2088722012892870");
+
                         // Console.WriteLine("调用成功");
                         ret.qrcode = response.QrCode;
                         putredis(oid, response.OutTradeNo);

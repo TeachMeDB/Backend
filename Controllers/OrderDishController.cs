@@ -44,7 +44,7 @@ namespace youAreWhatYouEat.Controllers
             public string? dish_picture { get; set; }
             public int? dish_num { get; set; }
             public int? table_id { get; set; }
-            public int? dish_id { get; set; }
+            public decimal? dish_id { get; set; }
         }
 
         public class OrderDishInfo2
@@ -91,7 +91,7 @@ namespace youAreWhatYouEat.Controllers
                 dishInfo.dish_num = 1;
                 dishInfo.dish_picture = System.Configuration.ConfigurationManager.AppSettings["ImagesUrl"] + "dishes/dish_" + dish.DishId.ToString() + ".png";
                 dishInfo.table_id = Convert.ToInt32(orderdish.TableId);
-                dishInfo.dish_id = Convert.ToInt32(dish.DishId);
+                dishInfo.dish_id = dish.DishId;
                 orderDishInfo.dish_info.Add(dishInfo);
             }
             return Ok(orderDishInfo);
@@ -99,7 +99,7 @@ namespace youAreWhatYouEat.Controllers
 
         public class DishInfo2
         {
-            public int dish_id { get; set; }
+            public decimal dish_id { get; set; }
             public string? dish_name { get; set; }
             public decimal? dish_price { get; set; }
             public string? dish_picture { get; set; }
@@ -131,7 +131,7 @@ namespace youAreWhatYouEat.Controllers
             foreach (var dish in tag.Dishes)
             {
                 DishInfo2 d = new DishInfo2();
-                d.dish_id = Convert.ToInt32(dish.DishId);
+                d.dish_id = dish.DishId;
                 d.dish_name = dish.DishName;
                 d.dish_price = dish.DishPrice;
                 d.dish_description = dish.DishDescription;
@@ -285,7 +285,7 @@ namespace youAreWhatYouEat.Controllers
 
         public class DishesInfo
         {
-            public int? dish_id { get; set; }
+            public decimal? dish_id { get; set; }
             public string? dish_name { get; set; }
             public string? dish_picture { get; set; }
             public decimal? dish_price { get; set; }
@@ -311,7 +311,7 @@ namespace youAreWhatYouEat.Controllers
             foreach (var d in dishes)
             {
                 DishesInfo info = new DishesInfo();
-                info.dish_id = Convert.ToInt32(d.DishId);
+                info.dish_id = d.DishId;
                 info.dish_name = d.DishName;
                 info.dish_price = d.DishPrice;
                 info.dish_description = d.DishDescription;
@@ -357,7 +357,7 @@ namespace youAreWhatYouEat.Controllers
         }
 
         [HttpGet("GetRealPrice")]
-        public async Task<ActionResult<RealPrice>> GetRealPrice(int promotion_id, int dish_id)
+        public async Task<ActionResult<RealPrice>> GetRealPrice(int promotion_id, decimal dish_id)
         {
             var pro = await _context.Promotions
                 .Include(p => p.Hasdishes)
@@ -380,7 +380,7 @@ namespace youAreWhatYouEat.Controllers
 
         public class OrderInfo3
         {
-            public int dish_id { get; set; }
+            public decimal dish_id { get; set; }
             public int dish_num { get; set; }
             public decimal dish_price_to_pay { get; set; } = 0;
             public string? remark { get; set; } = null;
@@ -411,18 +411,12 @@ namespace youAreWhatYouEat.Controllers
             order.CreationTime = DateTime.Now.ToUniversalTime().AddHours(8);
 
             Random random = new Random();
-            string order_id = "";
-            do
+            string order_id = order.CreationTime.ToString("yyyyMMddHHmmss") + "000";
+            while (orders.IndexOf(order_id) != -1)
             {
-                order_id = "";
-                for (int i = 0; i < 11; i++)
-                {
-                    int r = random.Next(0, 62);
-                    if (r < 10) order_id += r.ToString();
-                    else if (r < 36) order_id += (char)(97 + r - 10);
-                    else order_id += (char)(65 + r - 36);
-                }
-            } while (orders.IndexOf(order_id) != -1);
+                decimal t = Convert.ToDecimal(order_id) + 1;
+                order_id = t.ToString();
+            }
             order.OrderId = order_id;
             order.TableId = p.table_id;
             try
@@ -558,7 +552,7 @@ namespace youAreWhatYouEat.Controllers
         {
             public decimal? rate { get; set; }
             public string? content { get; set; }
-            public int? dish_id { get; set; }
+            public decimal? dish_id { get; set; }
             public string? username { get; set; }
         }
 
